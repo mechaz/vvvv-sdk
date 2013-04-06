@@ -166,23 +166,22 @@ namespace VVVV.Nodes.Devices.Leap
 						FPointingDistance[i] = tipToScreen.Magnitude * (float) 0.001;
 					}
 					
-					
-					
-					if(FUpdateScreensIn.IsChanged)
-					{
-						int ScreenCount = FLeapController.CalibratedScreens.Count;
-						ScreenList Screens = FLeapController.CalibratedScreens;
-						FScreensOut.SliceCount = ScreenCount;
-						
-						for (int k = 0; k < ScreenCount; k++)
-						{
-							FScreensOut[k] = Screens[k];
-						}
-					}
 				}
-				
 			}
 			
+			if(FUpdateScreensIn.IsChanged)
+			{
+				if(FLeapController.IsConnected)
+				{
+					int ScreenCount = FLeapController.CalibratedScreens.Count;
+					ScreenList Screens = FLeapController.CalibratedScreens;
+					FScreensOut.SliceCount = ScreenCount;
+					for (int k = 0; k < ScreenCount; k++)
+					{
+						FScreensOut[k] = Screens[k];
+					}
+				}
+			}
 		}
 		
 

@@ -527,9 +527,9 @@
    </BOUNDS>
    </NODE>
    <NODE nodename="IOBox (Value Advanced)" componentmode="InABox" id="67" systemname="IOBox (Value Advanced)">
-   <BOUNDS type="Node" left="660" top="1320" width="0" height="0">
+   <BOUNDS type="Node" left="612" top="1296" width="0" height="0">
    </BOUNDS>
-   <BOUNDS type="Box" left="660" top="1320" width="480" height="480">
+   <BOUNDS type="Box" left="612" top="1296" width="480" height="480">
    </BOUNDS>
    <PIN pinname="Y Input Value" slicecount="1" values="0">
    </PIN>
@@ -547,9 +547,9 @@
    <LINK srcnodeid="67" srcpinname="Y Output Value" dstnodeid="0" dstpinname="Update Screens">
    </LINK>
    <NODE nodename="IOBox (Value Advanced)" componentmode="InABox" id="68" systemname="IOBox (Value Advanced)">
-   <BOUNDS type="Node" left="10644" top="3084" width="0" height="0">
+   <BOUNDS type="Node" left="10428" top="2976" width="0" height="0">
    </BOUNDS>
-   <BOUNDS type="Box" left="10644" top="3084" width="264" height="828">
+   <BOUNDS type="Box" left="10428" top="2976" width="264" height="828">
    </BOUNDS>
    <PIN pinname="Units" slicecount="1" values="||">
    </PIN>
@@ -850,8 +850,6 @@
    </LINK>
    <LINK srcnodeid="131" srcpinname="Output" dstnodeid="86" dstpinname="Color">
    </LINK>
-   <LINK srcnodeid="0" srcpinname="Screens" dstnodeid="64" dstpinname="Screens">
-   </LINK>
    <NODE systemname="Transform (Transform 3d)" nodename="Transform (Transform 3d)" componentmode="Hidden" id="144">
    <BOUNDS type="Node" left="9684" top="8808" width="100" height="100">
    </BOUNDS>
@@ -1023,5 +1021,7 @@
    </PIN>
    </NODE>
    <LINK srcnodeid="0" srcpinname="Y" dstnodeid="161" dstpinname="Y Input Value">
+   </LINK>
+   <LINK srcnodeid="0" srcpinname="Screens" dstnodeid="64" dstpinname="Screens">
    </LINK>
    </PATCH>
