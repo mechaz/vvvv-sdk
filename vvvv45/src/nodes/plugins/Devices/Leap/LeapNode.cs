@@ -90,6 +90,30 @@ namespace VVVV.Nodes.Devices.Leap
 		
 		[Output("PointingDistance")]
 		ISpread<float> FPointingDistance;
+		
+		//Gesture
+		[Input("EnableGestures", IsSingle = true, IsToggle=true)]
+		IDiffSpread<bool> FEnabelGestures;
+		
+		[Output("CircleGesture")]
+		ISpread<CircleGesture> FCircleGestureOut;
+		
+		[Output("KeyTapGesture")]
+		ISpread<KeyTapGesture> FKeyTapGestureOut;
+		
+		[Output("ScreenTapGesture")]
+		ISpread<ScreenTapGesture> FScreenTapGestureOut;
+		
+		[Output("SwipeGesture")]
+		ISpread<SwipeGesture> FSwipeGestureOut;
+		
+		
+		List<CircleGesture> FCircleGestures = new List<CircleGesture>();
+		List<KeyTapGesture> FKeyTapGestures = new List<KeyTapGesture>();
+		List<ScreenTapGesture> FScreenTapGestures = new List<ScreenTapGesture>();
+		List<SwipeGesture> FSwipeGestures = new List<SwipeGesture>();
+		
+		
 		#pragma warning restore
 		
 		Controller FLeapController = new Controller();
@@ -102,6 +126,60 @@ namespace VVVV.Nodes.Devices.Leap
 			
 			if(FLeapController.IsConnected)
 			{
+				
+				if(FEnabelGestures.IsChanged && FEnabelGestures[0])
+				{
+					FLeapController.EnableGesture (Gesture.GestureType.TYPECIRCLE);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPEKEYTAP);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPESCREENTAP);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPESWIPE);
+				}
+				
+				if(FEnabelGestures[0])
+				{
+					GestureList Gestures = FLeapController.Frame().Gestures();
+					FCircleGestures.Clear();
+					FKeyTapGestures.Clear();
+					FScreenTapGestures.Clear();
+					FSwipeGestures.Clear();
+					
+					foreach(Gesture G in Gestures)
+					{
+						switch (G.Type) {
+							case Gesture.GestureType.TYPECIRCLE:
+								FCircleGestures.Add(new CircleGesture(G));
+								break;
+							case Gesture.GestureType.TYPESWIPE:
+								FSwipeGestures.Add(new SwipeGesture(G));
+								break;
+							case Gesture.GestureType.TYPEKEYTAP:
+								FKeyTapGestures.Add(new KeyTapGesture(G));
+								break;
+							case Gesture.GestureType.TYPESCREENTAP:
+								FScreenTapGestures.Add(new ScreenTapGesture(G));
+								break;
+							default:
+								break;
+						}
+					}
+					
+					FCircleGestureOut.SliceCount = FCircleGestures.Count;
+					FCircleGestureOut.AssignFrom(FCircleGestures);
+					FSwipeGestureOut.SliceCount = FSwipeGestures.Count;
+					FSwipeGestureOut.AssignFrom(FSwipeGestures);
+					FKeyTapGestureOut.SliceCount = FKeyTapGestures.Count;
+					FKeyTapGestureOut.AssignFrom(FKeyTapGestures);
+					FScreenTapGestureOut.SliceCount = FScreenTapGestures.Count;
+					FScreenTapGestureOut.AssignFrom(FScreenTapGestures);
+				}else
+				{
+					FCircleGestureOut.SliceCount = 0;
+					FSwipeGestureOut.SliceCount = 0;
+					FKeyTapGestureOut.SliceCount = 0;
+					FScreenTapGestureOut.SliceCount = 0;
+				}
+				
+				
 				var hands = FLeapController.Frame().Hands;
 				SpreadMax = hands.Count;
 				
@@ -155,7 +233,7 @@ namespace VVVV.Nodes.Devices.Leap
 						ScreenList screens = FLeapController.CalibratedScreens;
 						Screen screen = screens.ClosestScreenHit(pointable);
 
-						Vector normalizedCoordinates = screen.Intersect(pointable, true, 1);
+						Vector normalizedCoordinates = screen.Intersect(pointable, true, FCropRatio[0]);
 						FXOut.Add((int)(normalizedCoordinates.x * screen.WidthPixels));
 						FYOut.Add(screen.HeightPixels - (int)(normalizedCoordinates.y * screen.HeightPixels));
 						
@@ -167,11 +245,8 @@ namespace VVVV.Nodes.Devices.Leap
 					}
 					
 				}
-			}
-			
-			if(FUpdateScreensIn.IsChanged)
-			{
-				if(FLeapController.IsConnected)
+				
+				if(FUpdateScreensIn.IsChanged)
 				{
 					int ScreenCount = FLeapController.CalibratedScreens.Count;
 					ScreenList Screens = FLeapController.CalibratedScreens;
@@ -180,8 +255,19 @@ namespace VVVV.Nodes.Devices.Leap
 					{
 						FScreensOut[k] = Screens[k];
 					}
+					
 				}
+			}else
+			{
+				FCircleGestureOut.SliceCount = 0;
+				FSwipeGestureOut.SliceCount = 0;
+				FKeyTapGestureOut.SliceCount = 0;
+				FScreenTapGestureOut.SliceCount = 0;
+				FScreensOut.SliceCount = 0;
 			}
+			
+
+
 		}
 		
 

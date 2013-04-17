@@ -21,6 +21,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CircleGestureNode.cs" />
+    <Compile Include="ScreenTapGestureNode.cs" />
+    <Compile Include="KeyTapGestureNode.cs" />
+    <Compile Include="SwipeGestureNode.cs" />
     <Compile Include="LeapNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenNode.cs" />
