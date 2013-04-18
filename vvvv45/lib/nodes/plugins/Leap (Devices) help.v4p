@@ -573,9 +573,9 @@
    <LINK srcnodeid="64" srcpinname="ID" dstnodeid="68" dstpinname="Y Input Value" hiddenwhenlocked="0">
    </LINK>
    <NODE systemname="IOBox (Value Advanced)" nodename="IOBox (Value Advanced)" componentmode="InABox" id="71" exposed="0" hiddenwhenlocked="0">
-   <BOUNDS type="Node" left="11304" top="3120" width="100" height="100">
+   <BOUNDS type="Node" left="10908" top="2796" width="100" height="100">
    </BOUNDS>
-   <BOUNDS type="Box" left="11304" top="3120" width="2664" height="780">
+   <BOUNDS type="Box" left="10908" top="2796" width="2664" height="780">
    </BOUNDS>
    <PIN pinname="Y Input Value" visible="1">
    </PIN>

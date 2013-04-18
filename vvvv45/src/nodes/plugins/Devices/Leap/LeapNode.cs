@@ -96,7 +96,7 @@ namespace VVVV.Nodes.Devices.Leap
 		IDiffSpread<bool> FEnabelGestures;
 		
 		[Output("CircleGesture")]
-		ISpread<CircleGesture> FCircleGestureOut;
+		ISpread<FullCircleGesture> FCircleGestureOut;
 		
 		[Output("KeyTapGesture")]
 		ISpread<KeyTapGesture> FKeyTapGestureOut;
@@ -108,7 +108,7 @@ namespace VVVV.Nodes.Devices.Leap
 		ISpread<SwipeGesture> FSwipeGestureOut;
 		
 		
-		List<CircleGesture> FCircleGestures = new List<CircleGesture>();
+		List<FullCircleGesture> FCircleGestures = new List<FullCircleGesture>();
 		List<KeyTapGesture> FKeyTapGestures = new List<KeyTapGesture>();
 		List<ScreenTapGesture> FScreenTapGestures = new List<ScreenTapGesture>();
 		List<SwipeGesture> FSwipeGestures = new List<SwipeGesture>();
@@ -147,7 +147,7 @@ namespace VVVV.Nodes.Devices.Leap
 					{
 						switch (G.Type) {
 							case Gesture.GestureType.TYPECIRCLE:
-								FCircleGestures.Add(new CircleGesture(G));
+								FCircleGestures.Add(new FullCircleGesture(G, (new CircleGesture(FLeapController.Frame(1).Gesture(G.Id))).Progress));
 								break;
 							case Gesture.GestureType.TYPESWIPE:
 								FSwipeGestures.Add(new SwipeGesture(G));

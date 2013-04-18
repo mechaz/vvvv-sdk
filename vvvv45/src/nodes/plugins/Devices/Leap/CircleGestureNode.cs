@@ -30,7 +30,7 @@ namespace VVVV.Nodes.Devices.Leap
 
 		
 		[Input("CircleGesture")]
-		IDiffSpread<CircleGesture> FCircleGestureIn;
+		IDiffSpread<FullCircleGesture> FCircleGestureIn;
 		
 		[Output("ID")]
 		ISpread<int> FIdOut;
@@ -77,18 +77,10 @@ namespace VVVV.Nodes.Devices.Leap
 						clockwiseness = "counterclockwise";
 					}
 
-					float sweptAngle = 0;
-
-					// Calculate angle swept since last frame
-//					if (CircleGestures[i].State != Gesture.GestureState.STATESTART) {
-//						CircleGesture previousUpdate = new CircleGesture (FControllerIn[0].Frame(1).Gesture (CircleGestures[i].Id));
-//						sweptAngle = (CircleGestures[i].Progress - previousUpdate.Progress) * 360;
-//					}
-
 					FIdOut[i] = FCircleGestureIn[i].Id;
 					FStateOut[i] = FCircleGestureIn[i].State.ToString();
 					FProgressOut[i] = FCircleGestureIn[i].Progress;
-					//FAngleOut[i]  = sweptAngle;
+					FAngleOut[i]  = FCircleGestureIn[i].Angle;
 					FRadiusOut[i]  = FCircleGestureIn[i].Radius;
 					FClockwisenessOut[i] = clockwiseness;
 				}
