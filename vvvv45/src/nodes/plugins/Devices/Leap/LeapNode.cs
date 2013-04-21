@@ -60,6 +60,12 @@ namespace VVVV.Nodes.Devices.Leap
 		[Input("Configuration")]
 		IDiffSpread<LeapConfiguration> FConfigIn;
 		
+		[Output("Frame")]
+		ISpread<double> FFrameOut;
+		
+		[OutputAttribute("Timestamp")]
+		ISpread<double> FTimeStampOut;
+		
 		
 		//Fields
 		List<FullCircleGesture> FCircleGestures = new List<FullCircleGesture>();
@@ -78,6 +84,10 @@ namespace VVVV.Nodes.Devices.Leap
 		{
 			if(FLeapController.IsConnected)
 			{
+				Frame frame = FLeapController.Frame();
+				FFrameOut[0] = (double)frame.Id;
+				FTimeStampOut[0] = (double)frame.Timestamp;
+				
 				if(FConfigIn.IsChanged)
 				{
 					SortedList<string,float> FFloatSetConfig = FConfigIn[0].FloatConfig;
@@ -149,7 +159,7 @@ namespace VVVV.Nodes.Devices.Leap
 					FScreensOut[0] = Screens;
 				}
 				
-				var Hands = FLeapController.Frame().Hands;
+				var Hands = frame.Hands;
 				if(Hands != null)
 				{
 					FHandOut.SliceCount = Hands.Count;

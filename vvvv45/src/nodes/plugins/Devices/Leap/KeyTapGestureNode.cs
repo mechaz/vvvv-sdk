@@ -62,10 +62,16 @@ namespace VVVV.Nodes.Devices.Leap
 			
 			for (int i = 0; i < SpreadMax; i++)
 			{
+				try
+				{
 				FIdOut[i] = FKeyTapGestureIn[i].Id;
 				FStateOut[i] = FKeyTapGestureIn[i].State.ToString();
 				FPositionOut[i] = FKeyTapGestureIn[i].Position.ToVector3DPos();
 				FDirectionOut[i]  = FKeyTapGestureIn[i].Direction.ToVector3DDir();
+				}catch(NullReferenceException)
+				{
+					
+				}
 			}
 		}
 	}

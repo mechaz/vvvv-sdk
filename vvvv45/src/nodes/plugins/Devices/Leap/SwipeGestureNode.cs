@@ -38,6 +38,9 @@ namespace VVVV.Nodes.Devices.Leap
 		[Output("State")]
 		ISpread<string> FStateOut;
 		
+		[Output("StartPosition")]
+		ISpread<Vector3D> FStartPoistionOut;
+		
 		[Output("Position")]
 		ISpread<Vector3D> FPositionOut;
 		
@@ -56,18 +59,28 @@ namespace VVVV.Nodes.Devices.Leap
 			
 			FIdOut.SliceCount = SpreadMax;
 			FStateOut.SliceCount = SpreadMax;
+			FStartPoistionOut.SliceCount = SpreadMax;
 			FPositionOut.SliceCount = SpreadMax;
 			FDirectionOut.SliceCount  = SpreadMax;
 			FSpeedOut.SliceCount = SpreadMax;
 			
 			for (int i = 0; i < SpreadMax; i++)
 			{
-				FIdOut[i] = FSwipeGestureIn[i].Id;
-				FStateOut[i] = FSwipeGestureIn[i].State.ToString();
-				FPositionOut[i] = FSwipeGestureIn[i].Position.ToVector3DPos();
-				FDirectionOut[i]  = FSwipeGestureIn[i].Direction.ToVector3DDir();
-				FSpeedOut[i] = FSwipeGestureIn[i].Speed;
+				try
+				{
+					FIdOut[i] = FSwipeGestureIn[i].Id;
+					FStateOut[i] = FSwipeGestureIn[i].State.ToString();
+					FStartPoistionOut[i] = FSwipeGestureIn[i].StartPosition.ToVector3DPos();
+					FPositionOut[i] = FSwipeGestureIn[i].Position.ToVector3DPos();
+					FDirectionOut[i]  = FSwipeGestureIn[i].Direction.ToVector3DDir();
+					FSpeedOut[i] = FSwipeGestureIn[i].Speed;
+				}catch(NullReferenceException)
+				{
+					
+				}
+
 			}
+			
 		}
 	}
 }

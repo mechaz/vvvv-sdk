@@ -74,25 +74,31 @@ namespace VVVV.Nodes.Devices.Leap
 			
 			for (int i = 0; i < SpreadMax; i++)
 			{
-				if(FCircleGestureIn[i].IsValid)
+				try
 				{
-					// Calculate clock direction using the angle between circle normal and pointable
-					String clockwiseness;
-					if (FCircleGestureIn[i].Pointable.Direction.AngleTo (FCircleGestureIn[i].Normal) <= Math.PI / 4) {
-						//Clockwise if angle is less than 90 degrees
-						clockwiseness = "clockwise";
-					} else {
-						clockwiseness = "counterclockwise";
-					}
+					if(FCircleGestureIn[i].IsValid)
+					{
+						// Calculate clock direction using the angle between circle normal and pointable
+						String clockwiseness;
+						if (FCircleGestureIn[i].Pointable.Direction.AngleTo (FCircleGestureIn[i].Normal) <= Math.PI / 4) {
+							//Clockwise if angle is less than 90 degrees
+							clockwiseness = "clockwise";
+						} else {
+							clockwiseness = "counterclockwise";
+						}
 						
-					FCenterOut[i] = FCircleGestureIn[i].Center.ToVector3DPos();
-					FNormalOut[i] = FCircleGestureIn[i].Normal.ToVector3DDir();
-					FIdOut[i] = FCircleGestureIn[i].Id;
-					FStateOut[i] = FCircleGestureIn[i].State.ToString();
-					FProgressOut[i] = FCircleGestureIn[i].Progress;
-					FAngleOut[i]  = FCircleGestureIn[i].Angle;
-					FRadiusOut[i]  = FCircleGestureIn[i].Radius;
-					FClockwisenessOut[i] = clockwiseness;
+						FCenterOut[i] = FCircleGestureIn[i].Center.ToVector3DPos();
+						FNormalOut[i] = FCircleGestureIn[i].Normal.ToVector3DDir();
+						FIdOut[i] = FCircleGestureIn[i].Id;
+						FStateOut[i] = FCircleGestureIn[i].State.ToString();
+						FProgressOut[i] = FCircleGestureIn[i].Progress;
+						FAngleOut[i]  = FCircleGestureIn[i].Angle;
+						FRadiusOut[i]  = FCircleGestureIn[i].Radius;
+						FClockwisenessOut[i] = clockwiseness;
+					}
+				}catch(NullReferenceException)
+				{
+					
 				}
 			}
 			

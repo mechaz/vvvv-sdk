@@ -124,50 +124,56 @@ namespace VVVV.Nodes.Devices.Leap
 				
 				for(int i=0; i < SpreadMax; i++)
 				{
-					var hand = FHandIn[i];
-					
-					if(hand != null)
+					try
 					{
-						FHandPosOut[i] = hand.PalmPosition.ToVector3DPos();
-						FHandDirOut[i] = hand.Direction.ToVector3DDir();
-						FHandNormOut[i] = hand.PalmNormal.ToVector3DDir();
-						FHandBallCentOut[i] = hand.SphereCenter.ToVector3DPos();
-						FHandBallRadOut[i] = hand.SphereRadius * 0.001;
-						FHandVelOut[i] = hand.PalmVelocity.ToVector3DPos();
-						FHandIDOut[i] = hand.Id;
+						var hand = FHandIn[i];
 						
-					}
-					
-					var pointables = hand.Pointables;
-					
-					for(int j=0; j < pointables.Count; j++)
-					{
-						var pointable = pointables[j];
-						FFingerPosOut.Add(pointable.TipPosition.ToVector3DPos());
-						FFingerDirOut.Add(pointable.Direction.ToVector3DDir());
-						FFingerVelOut.Add(pointable.TipVelocity.ToVector3DPos());
-						FFingerIsToolOut.Add(pointable.IsTool);
-						FFingerSizeOut.Add(new Vector2D(pointable.Width * 0.001, pointable.Length * 0.001));
-						FFingerIDOut.Add(pointable.Id);
-						FHandSliceOut.Add(i);
-						
-						
-						//TODO:Want this as Screens an not as List
-						if(FScreenIn[0] != null)
+						if(hand != null)
 						{
-							Screen screen = FScreenIn[0].ClosestScreenHit(pointable);
-
-							Vector normalizedCoordinates = screen.Intersect(pointable, true, FCropRatio[0]);
-							FXOut.Add((normalizedCoordinates.x * screen.WidthPixels));
-							FYOut.Add(screen.HeightPixels - (normalizedCoordinates.y * screen.HeightPixels));
-							
-							FProjectionPointOut.Add(screen.Project(pointable.TipPosition, false).ToVector3DPos());
-							
-							Vector intersection = screen.Intersect(pointable, false);
-							Vector tipToScreen = intersection - pointable.TipPosition;
-							FPointingDistance.Add(tipToScreen.Magnitude * (float) 0.001);
+							FHandPosOut[i] = hand.PalmPosition.ToVector3DPos();
+							FHandDirOut[i] = hand.Direction.ToVector3DDir();
+							FHandNormOut[i] = hand.PalmNormal.ToVector3DDir();
+							FHandBallCentOut[i] = hand.SphereCenter.ToVector3DPos();
+							FHandBallRadOut[i] = hand.SphereRadius * 0.001;
+							FHandVelOut[i] = hand.PalmVelocity.ToVector3DPos();
+							FHandIDOut[i] = hand.Id;
 							
 						}
+						
+						var pointables = hand.Pointables;
+						
+						for(int j=0; j < pointables.Count; j++)
+						{
+							var pointable = pointables[j];
+							FFingerPosOut.Add(pointable.TipPosition.ToVector3DPos());
+							FFingerDirOut.Add(pointable.Direction.ToVector3DDir());
+							FFingerVelOut.Add(pointable.TipVelocity.ToVector3DPos());
+							FFingerIsToolOut.Add(pointable.IsTool);
+							FFingerSizeOut.Add(new Vector2D(pointable.Width * 0.001, pointable.Length * 0.001));
+							FFingerIDOut.Add(pointable.Id);
+							FHandSliceOut.Add(i);
+							
+							
+							//TODO:Want this as Screens an not as List
+							if(FScreenIn[0] != null)
+							{
+								Screen screen = FScreenIn[0].ClosestScreenHit(pointable);
+
+								Vector normalizedCoordinates = screen.Intersect(pointable, true, FCropRatio[0]);
+								FXOut.Add((normalizedCoordinates.x * screen.WidthPixels));
+								FYOut.Add(screen.HeightPixels - (normalizedCoordinates.y * screen.HeightPixels));
+								
+								FProjectionPointOut.Add(screen.Project(pointable.TipPosition, false).ToVector3DPos());
+								
+								Vector intersection = screen.Intersect(pointable, false);
+								Vector tipToScreen = intersection - pointable.TipPosition;
+								FPointingDistance.Add(tipToScreen.Magnitude * (float) 0.001);
+								
+							}
+						}
+					}catch(NullReferenceException)
+					{
+						
 					}
 					
 				}

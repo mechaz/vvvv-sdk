@@ -69,15 +69,21 @@ namespace VVVV.Nodes.Devices.Leap
 			
 			for (int i = 0; i < SpreadMax; i++)
 			{
-				Screen screen = FScreensIn[0][i];
-				if(screen.IsValid)
+				try
 				{
-					FIdOut[i] = screen.Id;
-					FBLCornerOut[i] = screen.BottomLeftCorner.ToVector3DPos();
-					FHeightOut[i] = screen.HeightPixels;
-					FWidthOut[i] = screen.WidthPixels;
-					FHAxisOut[i] = screen.HorizontalAxis.ToVector3DPos();
-					FVAxisOut[i] = screen.VerticalAxis.ToVector3DPos();
+					Screen screen = FScreensIn[0][i];
+					if(screen.IsValid)
+					{
+						FIdOut[i] = screen.Id;
+						FBLCornerOut[i] = screen.BottomLeftCorner.ToVector3DPos();
+						FHeightOut[i] = screen.HeightPixels;
+						FWidthOut[i] = screen.WidthPixels;
+						FHAxisOut[i] = screen.HorizontalAxis.ToVector3DPos();
+						FVAxisOut[i] = screen.VerticalAxis.ToVector3DPos();
+					}
+				}catch(NullReferenceException)
+				{
+					
 				}
 			}
 		}
