@@ -41,8 +41,14 @@ namespace VVVV.Nodes.Devices.Leap
 		[Output("Progress")]
 		ISpread<float> FProgressOut;
 		
+		[Output("Center")]
+		ISpread<Vector3D> FCenterOut;
+		
+		[Output("Normal")]
+		ISpread<Vector3D> FNormalOut;
+		
 		[Output("Angle")]
-		ISpread<float> FAngleOut;
+		ISpread<double> FAngleOut;
 		
 		[Output("Radius")]
 		ISpread<float> FRadiusOut;
@@ -60,9 +66,11 @@ namespace VVVV.Nodes.Devices.Leap
 			FIdOut.SliceCount = SpreadMax;
 			FStateOut.SliceCount = SpreadMax;
 			FProgressOut.SliceCount = SpreadMax;
-			//FAngleOut.SliceCount  = SpreadMax;
+			FAngleOut.SliceCount  = SpreadMax;
 			FRadiusOut.SliceCount  = SpreadMax;
 			FClockwisenessOut.SliceCount = SpreadMax;
+			FCenterOut.SliceCount = SpreadMax;
+			FNormalOut.SliceCount = SpreadMax;
 			
 			for (int i = 0; i < SpreadMax; i++)
 			{
@@ -76,7 +84,9 @@ namespace VVVV.Nodes.Devices.Leap
 					} else {
 						clockwiseness = "counterclockwise";
 					}
-
+						
+					FCenterOut[i] = FCircleGestureIn[i].Center.ToVector3DPos();
+					FNormalOut[i] = FCircleGestureIn[i].Normal.ToVector3DDir();
 					FIdOut[i] = FCircleGestureIn[i].Id;
 					FStateOut[i] = FCircleGestureIn[i].State.ToString();
 					FProgressOut[i] = FCircleGestureIn[i].Progress;

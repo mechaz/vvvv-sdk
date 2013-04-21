@@ -18,11 +18,11 @@ namespace VVVV.Nodes.Devices.Leap
 	public class FullCircleGesture:CircleGesture
 	{
 		private float FPreviousProgesss = 0;
-		public float Angle
+		public double Angle
 		{
 			get
 			{
-				return CalculateSwaptAngel();
+				return (double)CalculateSwaptAngel();
 			}
 			
 		}

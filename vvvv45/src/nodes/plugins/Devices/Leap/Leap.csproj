@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LeapCSharp.NET4.0">
-      <HintPath>..\..\..\..\..\..\common\src\thirdparty\LeapCSharp.NET4.0.dll</HintPath>
+      <HintPath>..\..\..\..\..\lib\nodes\plugins\LeapCSharp.NET4.0.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition.Codeplex, Version=4.1.2.0, Culture=neutral, PublicKeyToken=13e5ffd4e05db186, processorArchitecture=MSIL">
@@ -22,6 +22,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircleGestureNode.cs" />
+    <Compile Include="ConfigNode.cs" />
+    <Compile Include="HandNode.cs" />
     <Compile Include="FullCircleGesture.cs" />
     <Compile Include="ScreenTapGestureNode.cs" />
     <Compile Include="KeyTapGestureNode.cs" />

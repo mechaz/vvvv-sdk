@@ -44,9 +44,6 @@ namespace VVVV.Nodes.Devices.Leap
 		[Output("Direction")]
 		ISpread<Vector3D> FDirectionOut;
 		
-		[Output("Speed")]
-		ISpread<float> FSpeedOut;
-		
 		
 		#endregion fields & pins
 		
@@ -58,7 +55,6 @@ namespace VVVV.Nodes.Devices.Leap
 			FStateOut.SliceCount = SpreadMax;
 			FPositionOut.SliceCount = SpreadMax;
 			FDirectionOut.SliceCount  = SpreadMax;
-			FSpeedOut.SliceCount = SpreadMax;
 			
 			for (int i = 0; i < SpreadMax; i++)
 			{
