@@ -57,20 +57,21 @@ namespace VVVV.Nodes.Devices.Leap
 		//called when data for any output pin is requested
 		public void Evaluate(int SpreadMax)
 		{
-			
-			SpreadMax = FScreensIn[0].Count;
-			
-			FIdOut.SliceCount = SpreadMax;
-			FBLCornerOut.SliceCount = SpreadMax;
-			FHeightOut.SliceCount = SpreadMax;
-			FWidthOut.SliceCount = SpreadMax;
-			FHAxisOut.SliceCount = SpreadMax;
-			FVAxisOut.SliceCount = SpreadMax;
-			
-			for (int i = 0; i < SpreadMax; i++)
+			try
 			{
-				try
+				
+				SpreadMax = FScreensIn[0].Count;
+				
+				FIdOut.SliceCount = SpreadMax;
+				FBLCornerOut.SliceCount = SpreadMax;
+				FHeightOut.SliceCount = SpreadMax;
+				FWidthOut.SliceCount = SpreadMax;
+				FHAxisOut.SliceCount = SpreadMax;
+				FVAxisOut.SliceCount = SpreadMax;
+				
+				for (int i = 0; i < SpreadMax; i++)
 				{
+					
 					Screen screen = FScreensIn[0][i];
 					if(screen.IsValid)
 					{
@@ -81,14 +82,20 @@ namespace VVVV.Nodes.Devices.Leap
 						FHAxisOut[i] = screen.HorizontalAxis.ToVector3DPos();
 						FVAxisOut[i] = screen.VerticalAxis.ToVector3DPos();
 					}
-				}catch(NullReferenceException)
-				{
-					
 				}
+			}
+			catch(NullReferenceException)
+			{
+				
+			}
+			catch(DivideByZeroException)
+			{
+				
 			}
 		}
 	}
 }
+
 
 
 

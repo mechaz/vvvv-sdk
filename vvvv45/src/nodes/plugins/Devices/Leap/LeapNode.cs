@@ -97,16 +97,21 @@ namespace VVVV.Nodes.Devices.Leap
 						FLeapController.Config.Save();
 						Debug.WriteLine(FLeapController.Config.GetFloat(Pair.Key));
 					}
-					
-					
 				}
 				
 				if(FEnabelGestures.IsChanged && FEnabelGestures[0])
 				{
-					FLeapController.EnableGesture (Gesture.GestureType.TYPECIRCLE);
-					FLeapController.EnableGesture (Gesture.GestureType.TYPEKEYTAP);
-					FLeapController.EnableGesture (Gesture.GestureType.TYPESCREENTAP);
-					FLeapController.EnableGesture (Gesture.GestureType.TYPESWIPE);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPECIRCLE,true);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPEKEYTAP,true);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPESCREENTAP,true);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPESWIPE,true);
+				}
+				else
+				{
+					FLeapController.EnableGesture (Gesture.GestureType.TYPECIRCLE,false);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPEKEYTAP,false);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPESCREENTAP,false);
+					FLeapController.EnableGesture (Gesture.GestureType.TYPESWIPE,false);
 				}
 				
 				if(FEnabelGestures[0])
