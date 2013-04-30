@@ -106,7 +106,7 @@ namespace VVVV.Nodes.Devices.Leap
 					FLeapController.EnableGesture (Gesture.GestureType.TYPESCREENTAP,true);
 					FLeapController.EnableGesture (Gesture.GestureType.TYPESWIPE,true);
 				}
-				else
+				if(FEnabelGestures.IsChanged && FEnabelGestures[0] == false)
 				{
 					FLeapController.EnableGesture (Gesture.GestureType.TYPECIRCLE,false);
 					FLeapController.EnableGesture (Gesture.GestureType.TYPEKEYTAP,false);
