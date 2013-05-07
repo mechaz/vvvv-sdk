@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
   <Import Project="..\..\src\vvvv45.csproj" />
   <PropertyGroup>
@@ -213,6 +213,10 @@
       <Project>{A2F41E1C-BBFE-492F-AC51-430996F599A5}</Project>
       <Name>FormatedDate</Name>
     </ProjectReference>
+    <ProjectReference Include="nodes\plugins\Astronomy\ToUnixTimestamp\ToUnixTimestamp.csproj">
+      <Project>{726AD182-1214-4FE5-B6C7-8315C894F696}</Project>
+      <Name>ToUnixTimestamp</Name>
+    </ProjectReference>
     <ProjectReference Include="nodes\plugins\Bass\BassSound\BassSound.csproj">
       <Project>{8CC39D35-7F34-4B53-99CC-35BB088182AB}</Project>
       <Name>BassSound</Name>
@@ -224,6 +228,10 @@
     <ProjectReference Include="nodes\plugins\Devices\ArduinoFirmata\ArduinoFirmata.csproj">
       <Project>{AFEE382B-F971-4CF4-9F35-0112207097EB}</Project>
       <Name>ArduinoFirmata</Name>
+    </ProjectReference>
+    <ProjectReference Include="nodes\plugins\Devices\IS1\IS1.csproj">
+      <Project>{7DA50EB5-CDBD-49C8-95CE-75A2C685F540}</Project>
+      <Name>IS1</Name>
     </ProjectReference>
     <ProjectReference Include="nodes\plugins\Devices\LD2000\LD2000.csproj">
       <Project>{9DD0DF24-D149-44C1-A051-642F3608328C}</Project>
