@@ -31,19 +31,18 @@ namespace VVVV.Nodes
         [Input("Conversion Time", DefaultString = "1970-01-01 00:00:00")]
         ISpread<string> FInCurrentTime;
 
+        [Input("UTC Offset", DefaultValue = 0, MinValue = -12, MaxValue = 12, IsSingle = true)]
+        IDiffSpread<int> FInUTCOffset;
+
         [Input("Enable UTC Offset", IsToggle = true, IsSingle = true, DefaultBoolean = false)]
         ISpread<bool> FInEnableUTCOffset;
 
         // output pins
-        [Output("Current Time")]
-        ISpread<int> FOutCurrentTime;
-
-        [Output("Converted Time")]
+        [Output("Conversion timestamp")]
         ISpread<int> FOutConvertedTime;
-
-
-        [Input("UTC Offset", DefaultValue=0, MinValue=-12, MaxValue=12, IsSingle=true)]
-        IDiffSpread<int> FInUTCOffset;
+        
+        [Output("UTC timestamp")]
+        ISpread<int> FOutUTC;
 
         private int FUTCOffset;
         private bool FUseUTCOffset = false;
@@ -67,7 +66,7 @@ namespace VVVV.Nodes
         public void Evaluate(int SpreadMax)
         {
             FOutConvertedTime.SliceCount = SpreadMax;
-            FOutCurrentTime.SliceCount = SpreadMax;
+            FOutUTC.SliceCount = SpreadMax;
             
             if (FInUTCOffset.IsChanged)
             {
@@ -80,14 +79,15 @@ namespace VVVV.Nodes
                 {
                     if (FInEnableUTCOffset[i])
                     {
-                        FOutConvertedTime[i] = conv_DateTimeToTotalSeconds(conv_StringToDateTime_2(FInCurrentTime[i])) + Convert.ToInt32(FUTCOffset * 3600);
-                        FOutCurrentTime[i] = conv_UTCToTotalSeconds() + Convert.ToInt32(FUTCOffset * 3600);
+                        FOutConvertedTime[i] = conv_DateTimeToTotalSeconds(conv_StringToDateTime_2(FInCurrentTime[i])) - Convert.ToInt32(FUTCOffset * 3600);
+                        // FOutCurrentTime[i] = conv_UTCToTotalSeconds() + Convert.ToInt32(FUTCOffset * 3600);
                     }
                     else
                     {
                         FOutConvertedTime[i] = conv_DateTimeToTotalSeconds(conv_StringToDateTime_2(FInCurrentTime[i]));
-                        FOutCurrentTime[i] = conv_UTCToTotalSeconds();
+                        // FOutCurrentTime[i] = conv_UTCToTotalSeconds();
                     }
+                    FOutUTC[i] = conv_UTCToTotalSeconds();
                 }
                 catch (Exception e)
                 {
