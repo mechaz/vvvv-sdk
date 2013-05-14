@@ -213,7 +213,7 @@
       <Project>{A2F41E1C-BBFE-492F-AC51-430996F599A5}</Project>
       <Name>FormatedDate</Name>
     </ProjectReference>
-    <ProjectReference Include="nodes\plugins\Astronomy\ToUnixTimestamp\TimeToUnixTimestamp.csproj">
+    <ProjectReference Include="nodes\plugins\Astronomy\TimeToUnixTimestamp\TimeToUnixTimestamp.csproj">
       <Project>{726AD182-1214-4FE5-B6C7-8315C894F696}</Project>
       <Name>TimeToUnixTimestamp</Name>
     </ProjectReference>
