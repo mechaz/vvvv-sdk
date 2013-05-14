@@ -326,7 +326,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilsIL", "..\..\..\common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellExecute", "nodes\plugins\Windows\ShellExecute\ShellExecute.csproj", "{6421BE18-0B20-4448-90A9-B93908994B8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToUnixTimestamp", "nodes\plugins\Astronomy\ToUnixTimestamp\ToUnixTimestamp.csproj", "{726AD182-1214-4FE5-B6C7-8315C894F696}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeToUnixTimestamp", "nodes\plugins\Astronomy\ToUnixTimestamp\TimeToUnixTimestamp.csproj", "{726AD182-1214-4FE5-B6C7-8315C894F696}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

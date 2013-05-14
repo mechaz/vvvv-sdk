@@ -213,9 +213,9 @@
       <Project>{A2F41E1C-BBFE-492F-AC51-430996F599A5}</Project>
       <Name>FormatedDate</Name>
     </ProjectReference>
-    <ProjectReference Include="nodes\plugins\Astronomy\ToUnixTimestamp\ToUnixTimestamp.csproj">
+    <ProjectReference Include="nodes\plugins\Astronomy\ToUnixTimestamp\TimeToUnixTimestamp.csproj">
       <Project>{726AD182-1214-4FE5-B6C7-8315C894F696}</Project>
-      <Name>ToUnixTimestamp</Name>
+      <Name>TimeToUnixTimestamp</Name>
     </ProjectReference>
     <ProjectReference Include="nodes\plugins\Bass\BassSound\BassSound.csproj">
       <Project>{8CC39D35-7F34-4B53-99CC-35BB088182AB}</Project>
