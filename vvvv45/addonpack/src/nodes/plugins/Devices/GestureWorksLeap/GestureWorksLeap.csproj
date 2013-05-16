@@ -42,6 +42,10 @@
     <Reference Include="GestureWorksCoreNET32">
       <HintPath>dependencies\x86\GestureWorksCoreNET32.dll</HintPath>
     </Reference>
+    <Reference Include="LeapCSharp.NET4.0, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>dependencies\x86\LeapCSharp.NET4.0.dll</HintPath>
+    </Reference>
     <Reference Include="SlimDX" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition.Codeplex" />

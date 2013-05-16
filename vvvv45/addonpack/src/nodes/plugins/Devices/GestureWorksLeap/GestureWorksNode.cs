@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Threading;
+using System.Collections.Generic;
 
 using VVVV.PluginInterfaces.V1;
 using VVVV.PluginInterfaces.V2;
@@ -13,7 +14,9 @@ using VVVV.Core.Logging;
 
 using GestureWorksCoreNET;
 using GestureWorksCoreNET;
-using System.Collections.Generic;
+
+using Leap;
+
 #endregion usings
 
 namespace VVVV.Nodes
@@ -41,8 +44,9 @@ namespace VVVV.Nodes
         // private PointEventArray pEvents;
         // private GestureEventArray gEvents;
         private List<PointEvent> activePoints = new List<PointEvent>();
+        private List<GestureEvent> activeGestures = new List<GestureEvent>();
 
-
+        private Controller Leap = new Controller();
 
 		#endregion fields & pins
 
@@ -64,6 +68,10 @@ namespace VVVV.Nodes
             {
                 if (initialized) {
                     GWCore.ProcessFrame();
+                    if (Leap.IsConnected)
+                    {
+                        
+                    }
                     foreach (PointEvent point in GWCore.ConsumePointEvents())
                     {
                         PointEvent existingPoint = activePoints.Find(pt => pt.PointId == point.PointId);
@@ -86,6 +94,13 @@ namespace VVVV.Nodes
                         }
                     }
                     FOutPointCount[0] = activePoints.Count;
+                    GestureEventArray gestureEvents = GWCore.ConsumeGestureEvents();
+                    foreach (GestureEvent gEvent in gestureEvents)
+                    {
+                        
+                    }
+
+
                 } else {
                     InitGW();
                 }
@@ -111,6 +126,10 @@ namespace VVVV.Nodes
 
                 IntPtr ptr = System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle;
                 GWCore.RegisterWindowForTouch(ptr);
+
+                GWCore.RegisterTouchObject("finger");
+                GWCore.AddTouchPoint("finger", 1);
+
                 // GWCore.RegisterWindowForTouchByName("GWTester.v4p");
                 initialized = true;
             }
@@ -119,27 +138,5 @@ namespace VVVV.Nodes
                 FLogger.Log(LogType.Debug, e.Message);
             }
         }
-
-        private void InitGestureObjects()
-        {
-            GWCore.RegisterTouchObject("tap");
-            GWCore.RegisterTouchObject("swipe");
-            GWCore.RegisterTouchObject("circle");
-        }
-
-        private void CreateTouchPoints()
-        {
-            TouchPoint tpLarge = new TouchPoint();
-            tpLarge.X = 16;
-            tpLarge.Y = 20;
-            tpLarge.Z = 0;
-            tpLarge.W = 1920;
-            tpLarge.H = 1080;
-
-        }
-
-
-
-
 	}
 }
