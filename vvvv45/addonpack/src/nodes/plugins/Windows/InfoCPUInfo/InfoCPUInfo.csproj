@@ -1,6 +1,7 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{6A0AFB1F-8219-4A08-85F7-B7F19B66AC16}</ProjectGuid>
+    <ProjectGuid>{FA4E7CEA-6963-4282-A6D4-C855058A4896}</ProjectGuid>
     <Configuration>Debug</Configuration>
     <Platform>x86</Platform>
     <OutputType>Library</OutputType>
@@ -17,23 +18,55 @@
     <ReferencePath>..\..\..\..\..\..\Repos\vvvv-sdk-phlegma\vvvv-sdk\vvvv45\lib\core\</ReferencePath>
     <ReferencePath>..\..\..\..\Projekte\BMW-ActiveHybrid\DI_2012_bmw_active_hybrid\vvvv\vvvv_45beta27.1\bin\managed\</ReferencePath>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\..\..\..\..\lib\nodes\plugins\</OutputPath>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\..\..\lib\nodes\plugins\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DebugType>Full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisLogFile>bin\Debug\InfoCPUInfo.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aga.Controls">
-      <HintPath>..\..\..\..\openhardwaremonitor-v0.4.0-beta\OpenHardwareMonitor\Aga.Controls.dll</HintPath>
+      <HintPath>dependencies\Aga.Controls.dll</HintPath>
     </Reference>
     <Reference Include="OpenHardwareMonitorLib">
-      <HintPath>..\..\..\..\openhardwaremonitor-v0.4.0-beta\OpenHardwareMonitor\OpenHardwareMonitorLib.dll</HintPath>
+      <HintPath>dependencies\OpenHardwareMonitorLib.dll</HintPath>
     </Reference>
     <Reference Include="SlimDX" />
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition.Codeplex" />
+    <Reference Include="System.ComponentModel.Composition.Codeplex">
+      <HintPath>..\..\..\..\..\..\lib\core\System.ComponentModel.Composition.Codeplex.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="VVVV.Core" />
-    <Reference Include="VVVV.PluginInterfaces" />
-    <Reference Include="VVVV.Utils" />
-    <Reference Include="VVVV.Utils3rdParty" />
+    <Reference Include="VVVV.Core">
+      <HintPath>..\..\..\..\..\..\lib\core\VVVV.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="VVVV.PluginInterfaces">
+      <HintPath>..\..\..\..\..\..\lib\core\VVVV.PluginInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="VVVV.Utils">
+      <HintPath>..\..\..\..\..\..\lib\core\VVVV.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="VVVV.Utils3rdParty">
+      <HintPath>..\..\..\..\..\..\lib\core\VVVV.Utils3rdParty.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InfoCPUInfoNode.cs" />
