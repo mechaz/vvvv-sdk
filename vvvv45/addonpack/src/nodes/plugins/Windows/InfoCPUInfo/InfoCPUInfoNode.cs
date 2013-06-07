@@ -33,7 +33,7 @@ namespace VVVV.Nodes
 	#region PluginInfo
 	[PluginInfo(Name = "Monitor",
 	            Category = "System",
-	            Author = "Phlegma",
+	            Author = "Phlegma, niggos",
 	            Help = "Read OS Informations with OpenHardwareMonitoring",
 	            Tags = "OpenHardwareMonitor, Monitoring, System, CPU, Fan"
 	           )]
@@ -43,8 +43,6 @@ namespace VVVV.Nodes
 		#region fields & pins
 		[Input("Update", DefaultValue = 0, IsBang=true)]
 		IDiffSpread<bool> FUpdate;
-
-        
 
         [Input("CPU Enabled", DefaultBoolean = true, IsToggle = true)]
         IDiffSpread<bool> FCPUEnabled;
@@ -68,7 +66,7 @@ namespace VVVV.Nodes
         // filter by
         string[] FFilterTypeArray = { "None", "Voltage", "Clock", "Load", "Temperature", "Fan", "Flow", "Control", "Level", "Power", "Data", "Factor" };
         [Input("Filter", EnumName = "FilterType")]
-        IDiffSpread<EnumEntry> FFilterType;
+        IDiffSpread<EnumEntry> FFilter;
 
 		[Output("Hardware")]
 		ISpread<string> FHardware;
@@ -94,115 +92,18 @@ namespace VVVV.Nodes
                 { "/intelcpu/0/load/0/values", "H4sIAAAAAAAEAOy9B2AcSZYlJi9tynt/SvVK1+B0oQiAYBMk2JBAEOzBiM3mkuwdaUcjKasqgcplVmVdZhZAzO2dvPfee++999577733ujudTif33/8/XGZkAWz2zkrayZ4hgKrIHz9+fB8/Iu6//MH37x79i9++mpwcv/md/9df89egZ/xX/ym/5y/4D37618Lv7ya//u+58+u+5d9/z7/5t/w9/6u5fP5bH/6av+eTkXyefXxp26ONaf/v/dG/sf39D/rvnv4e5vc/0IP56/waK/vuHzf5I38P8/tv+mv8Rbb9f0pwTF9/zr/1X9vP/8I//+/6Pf7Z30N+/zdf/HX29zd/859q4aCNP5b//U+U3/+7f+zXOjZwfqvDX/V7/o9/vPz+a1G/pv0f+fGlhfk7eZ//N3/0v28//5X0u/n8Cxq7+f1X/tHft20A5x8a/W5/02+BP36Nf+j/nv8XfzrT+c2//Ob4p3+vktvUhNs/+xcWikP6e/4T/5jS5M8/sL8vP/5ff49f/Ivl9//sHzv6PX/vXyG//9R/94/9HuZ34P/5vyC//3W/5e/1exa/k+Bw4bUBnU2bP4Xg/1bn0uafeTH6PatfKL//N3/0t2y/gG9+/8+IzqYNxmU+/+jwX7afY67/nwAAAP//GYSA31gCAAA=" },
             });
 
-        
-        /*
-        MySettings settings = new MySettings(new Dictionary<string, string>
-        {
-                {"/intelcpu/0/load/1/plot", "false"},
-                {"/intelcpu/0/load/2/plot", "false"},
-                {"/intelcpu/0/load/3/plot", "false"},
-                {"/intelcpu/0/load/4/plot", "false"},
-                {"/intelcpu/0/load/0/plot", "false"},
-                {"/intelcpu/0/temperature/0/plot", "false"},
-                {"/intelcpu/0/temperature/1/plot", "false"},
-                {"/intelcpu/0/temperature/2/plot", "false"},
-                {"/intelcpu/0/temperature/3/plot", "false"},
-                {"/intelcpu/0/clock/1/plot", "false"},
-                {"/intelcpu/0/clock/2/plot", "false"},
-                {"/intelcpu/0/clock/3/plot", "false"},
-                {"/intelcpu/0/clock/4/plot", "false"},
-                {"/intelcpu/0/clock/0/plot", "false"},
-                {"/ram/load/0/plot", "false"},
-                {"/ram/data/0/plot", "false"},
-                {"/ram/data/1/plot", "false"},
-                {"/nvidiagpu/0/temperature/0/plot", "false"},
-                {"/nvidiagpu/0/fan/0/plot", "false"},
-                {"/nvidiagpu/0/clock/0/plot", "false"},
-                {"/nvidiagpu/0/clock/1/plot", "false"},
-                {"/nvidiagpu/0/clock/2/plot", "false"},
-                {"/nvidiagpu/0/load/0/plot", "false"},
-                {"/nvidiagpu/0/load/1/plot", "false"},
-                {"/nvidiagpu/0/load/2/plot", "false"},
-                {"/nvidiagpu/0/control/0/plot", "false"},
-                {"/nvidiagpu/0/load/3/plot", "false"},
-                {"/hdd/0/temperature/0/plot", "false"},
-                {"/hdd/0/load/0/plot", "false"},
-                {"mainForm.Location.X", "725"},
-                {"mainForm.Location.Y", "266"},
-                {"mainForm.Width", "470"},
-                {"mainForm.Height", "640"},
-                {"/lpc/w83667hgb/voltage/0/plot", "false"},
-                {"/lpc/w83667hgb/voltage/1/plot", "false"},
-                {"/lpc/w83667hgb/voltage/2/plot", "false"},
-                {"/lpc/w83667hgb/voltage/3/plot", "false"},
-                {"/lpc/w83667hgb/voltage/4/plot", "false"},
-                {"/lpc/w83667hgb/voltage/5/plot", "false"},
-                {"/lpc/w83667hgb/voltage/6/plot", "false"},
-                {"/lpc/w83667hgb/voltage/7/plot", "false"},
-                {"/lpc/w83667hgb/temperature/1/plot", "false"},
-                {"/lpc/w83667hgb/temperature/2/plot", "false"},
-                {"/lpc/w83667hgb/fan/1/plot", "false"},
-                {"/hdd/0/temperature/0/values", ""},
-                {"/hdd/0/load/0/values", ""},
-                {"/nvidiagpu/0/temperature/0/values", "H4sIAAAAAAAEAONYs+avrMEFDwYGCycAxERO6AwAAAA="},
-                {"/nvidiagpu/0/fan/0/values", "H4sIAAAAAAAEAONYs+avrMEFDwaFKS4A9FTSOwwAAAA="},
-                {"/nvidiagpu/0/clock/0/values", "H4sIAAAAAAAEAOtwL/0ra3DBg7HhlONNplxGBiAAsQFLExHsGAAAAA=="},
-                {"/nvidiagpu/0/clock/1/values", "H4sIAAAAAAAEAONYs+avrMEFDwYGdmcAbl6XxwwAAAA="},
-                {"/nvidiagpu/0/clock/2/values", "H4sIAAAAAAAEAFs1tfSvrMEFD8YGL6cbTLmMDEAAYgMAeVnQLhgAAAA="},
-                {"/nvidiagpu/0/load/0/values", "H4sIAAAAAAAEAONYs+avrMEFDwYgAACD2ANnDAAAAA=="},
-                {"/nvidiagpu/0/load/1/values", "H4sIAAAAAAAEAONYs+avrMEFDwaGBQ4A+iXYvwwAAAA="},
-                {"/nvidiagpu/0/load/2/values", "H4sIAAAAAAAEAONYs+avrMEFDwYgAACD2ANnDAAAAA=="},
-                {"/nvidiagpu/0/load/3/values", "H4sIAAAAAAAEAJO8vOavrMEFj1YhYUcApt51OAwAAAA="},
-                {"/nvidiagpu/0/control/0/values", "H4sIAAAAAAAEAONYs+avrMEFDwYGFScAmRk5DgwAAAA="},
-                {"/intelcpu/0/load/0/values", "H4sIAAAAAAAEADvGv+avrMEFjxJ7fkcAa/cg+wwAAAA="},
-                {"/intelcpu/0/load/1/values", "H4sIAAAAAAAEADvGv+avrMEFD+uNMxwBV5X87QwAAAA="},
-                {"/intelcpu/0/load/2/values", "H4sIAAAAAAAEADvGv+avrMEFjyT1DgcA+jOinwwAAAA="},
-                {"/intelcpu/0/load/3/values", "H4sIAAAAAAAEADvGv+avrMEFj7k3dB0ASklPLAwAAAA="},
-                {"/intelcpu/0/load/4/values", "H4sIAAAAAAAEADvGv+avrMEFjwZBGUcA41wYoQwAAAA="},
-                {"/intelcpu/0/temperature/0/values", "H4sIAAAAAAAEADvGv+avrMEFDwYGZycAvjOP9QwAAAA="},
-                {"/intelcpu/0/temperature/1/values", "H4sIAAAAAAAEADvGv+avrMEFDwYGCycAg5NEOQwAAAA="},
-                {"/intelcpu/0/temperature/2/values", "H4sIAAAAAAAEADvGv+avrMEFDwYGSycAwqJfIAwAAAA="},
-                {"/intelcpu/0/temperature/3/values", "H4sIAAAAAAAEADvGv+avrMEFDwYGcycATI/cvgwAAAA="},
-                {"/intelcpu/0/clock/0/values", "H4sIAAAAAAAEAONYs+avrMEFj5P7WZ0BTSTmMAwAAAA="},
-                {"/intelcpu/0/clock/1/values", "H4sIAAAAAAAEALtmtuavrMEFj0Pl01wA7GdmMgwAAAA="},
-                {"/intelcpu/0/clock/2/values", "H4sIAAAAAAAEAHseu+avrMEFj0Pl01wA+wwfzgwAAAA="},
-                {"/intelcpu/0/clock/3/values", "H4sIAAAAAAAEAPvRsuavrMEFj0Pl01wASKiBxAwAAAA="},
-                {"/intelcpu/0/clock/4/values", "H4sIAAAAAAAEAONYs+avrMEFj0Pl01wAzihTvAwAAAA="},
-                {"/lpc/w83667hgb/voltage/0/values", "H4sIAAAAAAAEAMs67fZP1uCCR5djgz0ADAyRvQwAAAA="},
-                {"/lpc/w83667hgb/voltage/1/values", "H4sIAAAAAAAEAMs67fZP1uCCx3r3h/YAVHUWUgwAAAA="},
-                {"/lpc/w83667hgb/voltage/2/values", "H4sIAAAAAAAEAMs67fZP1uCChyRLmAMAWQPtcwwAAAA="},
-                {"/lpc/w83667hgb/voltage/3/values", "H4sIAAAAAAAEAMs67fZP1uCChyRLmAMAWQPtcwwAAAA="},
-                {"/lpc/w83667hgb/voltage/4/values", "H4sIAAAAAAAEAMs67fZP1uCCxyWl2/YAp9r2oAwAAAA="},
-                {"/lpc/w83667hgb/voltage/5/values", "H4sIAAAAAAAEAMs67fZP1uCCR2w/kwMAAqAsVAwAAAA="},
-                {"/lpc/w83667hgb/voltage/6/values", "H4sIAAAAAAAEAMs67fZP1uCCx4YiDXsA4Xn0YgwAAAA="},
-                {"/lpc/w83667hgb/voltage/7/values", "H4sIAAAAAAAEAMs67fZP1uCCR4dYpAMASe4r7gwAAAA="},
-                {"/lpc/w83667hgb/voltage/8/values", ""},
-                {"/lpc/w83667hgb/temperature/0/values", ""},
-                {"/lpc/w83667hgb/temperature/1/values", "H4sIAAAAAAAEAMs67fZP1uCCBwODmRMAG7kG0gwAAAA="},
-                {"/lpc/w83667hgb/temperature/2/values", "H4sIAAAAAAAEAMs67fZP1uCCBwODjRMAkVHpKAwAAAA="},
-                {"/lpc/w83667hgb/fan/0/values", "H4sIAAAAAAAEAMs67fZP1uCCBwMQAADSCMjDDAAAAA=="},
-                {"/lpc/w83667hgb/fan/1/values", "H4sIAAAAAAAEAMs67fZP1uCCB5vgWhcAZNlfkQwAAAA="},
-                {"/lpc/w83667hgb/fan/2/values", "H4sIAAAAAAAEAMs67fZP1uCCBwMQAADSCMjDDAAAAA=="},
-                {"/lpc/w83667hgb/fan/3/values", "H4sIAAAAAAAEAMs67fZP1uCCBwMQAADSCMjDDAAAAA=="},
-                {"/lpc/w83667hgb/fan/4/values", "H4sIAAAAAAAEAMs67fZP1uCCBwMQAADSCMjDDAAAAA=="},
-                {"treeView.Columns.Sensor.Width", "250"},
-                {"treeView.Columns.Value.Width", "100"},
-                {"treeView.Columns.Min.Width", "100"},
-                {"treeView.Columns.Max.Width", "100"},
-                {"listenerPort", "8085"},
-        });*/
         private Computer FComputer;
 		private SortedList<String,List<ISensor>> FInstances = new SortedList<String, List<ISensor>>();
 		private bool FInit = true;
+        private bool FDoUpdate = false;
 
 		#endregion fields & pins
 
 
         public OpenHardwareMonitorNode()
         {
-            EnumManager.UpdateEnum("FilterType", "None", FFilterTypeArray);
+            EnumManager.UpdateEnum("FilterType", FFilterTypeArray[0], FFilterTypeArray);
         }
-
 
 		//called when data for any output pin is requested
 		public void Evaluate(int SpreadMax)
@@ -230,9 +131,15 @@ namespace VVVV.Nodes
                 FComputer.RAMEnabled = FRAMEnabled[0];
                 FComputer.FanControllerEnabled = FFanControllerEnabled[0];
                 FComputer.MainboardEnabled = FMainboardEnabled[0];
+                FDoUpdate = true;
             }
 
-			if(FUpdate.IsChanged && FUpdate[0] == true)
+            if (FUpdate.IsChanged && FUpdate[0] || FFilter.IsChanged)
+            {
+                FDoUpdate = true;
+            }
+
+			if(FDoUpdate)
 			{
 				ReadComputerHardware();
                 
@@ -252,7 +159,7 @@ namespace VVVV.Nodes
 						FHardware[Counter] = Sensor.Hardware.Name;
 						FIdentifier[Counter] = Sensor.Identifier.ToString();
 						FName[Counter] = Sensor.Name;
-                        
+                        FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
                         try
                         {
                             FValue[Counter] = (float)Sensor.Value;
@@ -261,11 +168,11 @@ namespace VVVV.Nodes
                         {
                             FValue[Counter] = -1f;
                         }
-                        FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
 						Counter++;
 					}
 				}
 			}
+            FDoUpdate = false;
 		}
 
 		private void ReadComputerHardware()
@@ -288,7 +195,18 @@ namespace VVVV.Nodes
                 {
                     if (!Sensor.IsDefaultHidden)
                     {
-                        SensorList.Add(Sensor);
+                        if (FFilter[0].Name.Equals(FFilterTypeArray[0]))
+                        {
+                            SensorList.Add(Sensor);
+                        }
+                        else
+                        {
+                            if (Sensor.SensorType.ToString().Equals(FFilter[0].Name))
+                            {
+                                SensorList.Add(Sensor);
+                            }
+                        }
+                        
                     }
                 }			
 				FInstances.Add(Hardware.Identifier.ToString(),SensorList);
@@ -336,7 +254,6 @@ namespace VVVV.Nodes
             }
         }
 	}
-
 
     public class MySettings : ISettings
     {
