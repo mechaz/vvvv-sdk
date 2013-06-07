@@ -41,10 +41,12 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aga.Controls">
+    <Reference Include="Aga.Controls, Version=1.7.0.0, Culture=neutral, PublicKeyToken=fcc90fbf924463a3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>dependencies\Aga.Controls.dll</HintPath>
     </Reference>
-    <Reference Include="OpenHardwareMonitorLib">
+    <Reference Include="OpenHardwareMonitorLib, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>dependencies\OpenHardwareMonitorLib.dll</HintPath>
     </Reference>
     <Reference Include="SlimDX" />
