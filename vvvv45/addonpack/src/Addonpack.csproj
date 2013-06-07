@@ -565,9 +565,9 @@
       <Project>{944D2BD5-2BCB-4A22-91B9-84949D26D150}</Project>
       <Name>EnvironmentNodes</Name>
     </ProjectReference>
-    <ProjectReference Include="nodes\plugins\Windows\InfoCPUInfo\InfoCPUInfo.csproj">
+    <ProjectReference Include="nodes\plugins\Windows\InfoCPUInfo\OpenHardwareMonitor.csproj">
       <Project>{FA4E7CEA-6963-4282-A6D4-C855058A4896}</Project>
-      <Name>InfoCPUInfo</Name>
+      <Name>OpenHardwareMonitor</Name>
     </ProjectReference>
     <ProjectReference Include="nodes\plugins\Windows\PowerState\PowerState.csproj">
       <Project>{7C6A994A-A307-4B55-9EA4-0469F6F59B4B}</Project>

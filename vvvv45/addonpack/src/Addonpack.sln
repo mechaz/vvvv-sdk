@@ -327,7 +327,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UtilsIL", "..\..\..\common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellExecute", "nodes\plugins\Windows\ShellExecute\ShellExecute.csproj", "{6421BE18-0B20-4448-90A9-B93908994B8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoCPUInfo", "nodes\plugins\Windows\InfoCPUInfo\InfoCPUInfo.csproj", "{FA4E7CEA-6963-4282-A6D4-C855058A4896}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenHardwareMonitor", "nodes\plugins\Windows\InfoCPUInfo\OpenHardwareMonitor.csproj", "{FA4E7CEA-6963-4282-A6D4-C855058A4896}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
