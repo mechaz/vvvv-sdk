@@ -8,23 +8,16 @@
  */
 
 #region usings
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 
-using VVVV.PluginInterfaces.V1;
+using VVVV.Core.Logging;
 using VVVV.PluginInterfaces.V2;
-using VVVV.Utils.VColor;
-using VVVV.Utils.VMath;
 
 using OpenHardwareMonitor.Hardware;
-using OpenHardwareMonitor.Collections;
 
-
-
-using VVVV.Core.Logging;
-using System.ComponentModel;
-using System.Threading;
 #endregion usings
 
 
@@ -98,7 +91,6 @@ namespace VVVV.Nodes
         private bool FDoUpdate = false;
 
 		#endregion fields & pins
-
 
         public OpenHardwareMonitorNode()
         {
