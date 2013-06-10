@@ -565,7 +565,7 @@
       <Project>{944D2BD5-2BCB-4A22-91B9-84949D26D150}</Project>
       <Name>EnvironmentNodes</Name>
     </ProjectReference>
-    <ProjectReference Include="nodes\plugins\Windows\InfoCPUInfo\OpenHardwareMonitor.csproj">
+    <ProjectReference Include="nodes\plugins\Windows\OpenHardwareMonitor\OpenHardwareMonitor.csproj">
       <Project>{FA4E7CEA-6963-4282-A6D4-C855058A4896}</Project>
       <Name>OpenHardwareMonitor</Name>
     </ProjectReference>
