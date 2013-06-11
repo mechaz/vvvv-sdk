@@ -65,8 +65,10 @@ namespace VVVV.Nodes.Devices.Leap
 		
 		[OutputAttribute("Timestamp")]
 		ISpread<double> FTimeStampOut;
-		
-		
+
+        [Output("InteractionBox")]
+        ISpread<InteractionBox> FInteractionBoxOut;
+
 		//Fields
 		List<FullCircleGesture> FCircleGestures = new List<FullCircleGesture>();
 		List<KeyTapGesture> FKeyTapGestures = new List<KeyTapGesture>();
@@ -76,7 +78,8 @@ namespace VVVV.Nodes.Devices.Leap
 		#pragma warning restore
 		
 		Controller FLeapController = new Controller();
-		
+        bool FInit = true;
+
 		#endregion fields & pins
 		
 		//called when data for any output pin is requested
@@ -87,7 +90,13 @@ namespace VVVV.Nodes.Devices.Leap
 				Frame frame = FLeapController.Frame();
 				FFrameOut[0] = (double)frame.Id;
 				FTimeStampOut[0] = (double)frame.Timestamp;
-				
+                if (FInit)
+                {
+                    FInteractionBoxOut.SliceCount = 1;
+                    FInteractionBoxOut[0] = new InteractionBox(new IntPtr(Controller.getCPtr(FLeapController).Handle.ToInt64()), false);
+                    FInit = false;
+                }
+
 				if(FConfigIn.IsChanged)
 				{
 					SortedList<string,float> FFloatSetConfig = FConfigIn[0].FloatConfig;
@@ -177,6 +186,8 @@ namespace VVVV.Nodes.Devices.Leap
 				FKeyTapGestureOut.SliceCount = 0;
 				FScreenTapGestureOut.SliceCount = 0;
 				FScreensOut.SliceCount = 0;
+                FInteractionBoxOut.SliceCount = 0;
+                FInit = true;
 			}
 			
 
