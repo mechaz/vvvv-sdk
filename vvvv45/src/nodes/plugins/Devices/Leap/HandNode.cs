@@ -76,7 +76,16 @@ namespace VVVV.Nodes.Devices.Leap
 		
 		[Output("Finger ID")]
 		ISpread<int> FFingerIDOut;
-		
+
+        [Output("Finger Touch Zone")]
+        ISpread<string> FFingerTouchZoneOut;
+
+        [Output("Finger Touch Distance")]
+        ISpread<double> FFingerTouchDistanceOut;
+
+        [Output("Stabilized Tip Position")]
+        ISpread<Vector3D> FFingerStabilizedTipPositionOut;
+
 		[Output("Hand Slice")]
 		ISpread<int> FHandSliceOut;
 		
@@ -116,6 +125,9 @@ namespace VVVV.Nodes.Devices.Leap
 				FFingerIsToolOut.SliceCount = 0;
 				FFingerSizeOut.SliceCount = 0;
 				FFingerIDOut.SliceCount = 0;
+                FFingerTouchZoneOut.SliceCount = 0;
+                FFingerTouchDistanceOut.SliceCount = 0;
+                FFingerStabilizedTipPositionOut.SliceCount = 0;
 				FHandSliceOut.SliceCount = 0;
 				FXOut.SliceCount = 0;
 				FYOut.SliceCount = 0;
@@ -151,6 +163,9 @@ namespace VVVV.Nodes.Devices.Leap
 							FFingerIsToolOut.Add(pointable.IsTool);
 							FFingerSizeOut.Add(new Vector2D(pointable.Width * 0.001, pointable.Length * 0.001));
 							FFingerIDOut.Add(pointable.Id);
+                            FFingerTouchZoneOut.Add(pointable.TouchZone.ToString());
+                            FFingerTouchDistanceOut.Add(pointable.TouchDistance);
+                            FFingerStabilizedTipPositionOut.Add(pointable.StabilizedTipPosition.ToVector3DPos());
 							FHandSliceOut.Add(i);
 							
 							
