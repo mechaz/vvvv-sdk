@@ -69,6 +69,9 @@ namespace VVVV.Nodes.Devices.Leap
         [Output("InteractionBox")]
         ISpread<InteractionBox> FInteractionBoxOut;
 
+        [Output("Device List")]
+        ISpread<DeviceList> FDeviceListOut;
+
 		//Fields
 		List<FullCircleGesture> FCircleGestures = new List<FullCircleGesture>();
 		List<KeyTapGesture> FKeyTapGestures = new List<KeyTapGesture>();
@@ -85,6 +88,8 @@ namespace VVVV.Nodes.Devices.Leap
 		//called when data for any output pin is requested
 		public void Evaluate(int SpreadMax)
 		{
+
+
 			if(FLeapController.IsConnected)
 			{
 				Frame frame = FLeapController.Frame();
@@ -92,6 +97,8 @@ namespace VVVV.Nodes.Devices.Leap
 				FTimeStampOut[0] = (double)frame.Timestamp;
                 if (FInit)
                 {
+                    FDeviceListOut.SliceCount = 1;
+                    FDeviceListOut[0] = FLeapController.Devices;
                     FInteractionBoxOut.SliceCount = 1;
                     FInteractionBoxOut[0] = new InteractionBox(new IntPtr(Controller.getCPtr(FLeapController).Handle.ToInt64()), false);
                     FInit = false;
@@ -187,6 +194,7 @@ namespace VVVV.Nodes.Devices.Leap
 				FScreenTapGestureOut.SliceCount = 0;
 				FScreensOut.SliceCount = 0;
                 FInteractionBoxOut.SliceCount = 0;
+                FDeviceListOut.SliceCount = 0;
                 FInit = true;
 			}
 			

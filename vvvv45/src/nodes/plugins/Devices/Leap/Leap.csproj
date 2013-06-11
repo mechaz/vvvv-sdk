@@ -24,6 +24,7 @@
   <ItemGroup>
     <Compile Include="CircleGestureNode.cs" />
     <Compile Include="ConfigNode.cs" />
+    <Compile Include="DeviceInfoNode.cs" />
     <Compile Include="HandNode.cs" />
     <Compile Include="FullCircleGesture.cs" />
     <Compile Include="InteractionBoxNode.cs" />
