@@ -31,8 +31,8 @@ namespace VVVV.Nodes.Devices.Leap
         #pragma warning disable 0649
 
 
-        [Input("InteractionBox", IsSingle = true)]
-        IDiffSpread<InteractionBox> FInteractionBoxIn;
+        [Input("Controller", IsSingle = true)]
+        IDiffSpread<Controller> FControllerIn;
 
         [Output("Center")]
         ISpread<Vector3D> FCenterOut;
@@ -61,26 +61,25 @@ namespace VVVV.Nodes.Devices.Leap
         //called when data for any output pin is requested
         public void Evaluate(int SpreadMax)
         {
-            if (FInteractionBoxIn.IsChanged)
+            if (FControllerIn.IsChanged)
             {
-                if (FInit && FInteractionBoxIn[0] != null)
+                if (FInit && FControllerIn[0] != null)
                 {
-                    FInteractionBox = FInteractionBoxIn[0];
+                    FInteractionBox = new InteractionBox(new IntPtr(Controller.getCPtr(FControllerIn[0]).Handle.ToInt64()), false);
                     FInit = false;
                 }
-                else if (FInit && FInteractionBoxIn[0] == null)
+                else if (FInit && FControllerIn == null)
                 {
                     FInit = true;
                 }
             }
 
-            if (FInteractionBoxIn[0] != null)
+            if (FControllerIn[0] != null)
             {
 
                 FCenterOut.SliceCount = FDepthOut.SliceCount = FWidthOut.SliceCount = FHeightOut.SliceCount = FIsValidOut.SliceCount = 1;
                 try
                 {
-
                     FCenterOut[0] = FInteractionBox.Center.ToVector3DPos();
                     FDepthOut[0] = FInteractionBox.Depth;
                     FWidthOut[0] = FInteractionBox.Width;
@@ -91,7 +90,6 @@ namespace VVVV.Nodes.Devices.Leap
                 {
 
                 }
-
             }
             else
             {

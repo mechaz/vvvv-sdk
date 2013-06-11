@@ -30,8 +30,8 @@ namespace VVVV.Nodes.Devices.Leap
 
         #pragma warning disable 0649
 
-        [Input("Device List", IsSingle = true)]
-        IDiffSpread<DeviceList> FDeviceListIn;
+        [Input("Controller", IsSingle = true)]
+        IDiffSpread<Controller> FControllerIn;
 
         [Input("Update", IsSingle = true, IsBang = true)]
         IDiffSpread<bool> FUpdateIn;
@@ -72,15 +72,16 @@ namespace VVVV.Nodes.Devices.Leap
                 pos = new Vector(Convert.ToSingle(FPositionIn[0].x), Convert.ToSingle(FPositionIn[0].y), Convert.ToSingle(FPositionIn[0].z));
             }
 
-            if (FDeviceListIn.IsChanged || (FUpdateIn.IsChanged && FUpdateIn[0]) || FPositionIn.IsChanged)
+            if (FControllerIn.IsChanged || (FUpdateIn.IsChanged && FUpdateIn[0]) || FPositionIn.IsChanged)
             {
-                if (FDeviceListIn[0] != null)
+                if (FControllerIn[0] != null)
                 {
-                    int count = FDeviceListIn[0].Count;
+                    DeviceList devList = FControllerIn[0].Devices;
+                    int count = devList.Count;
                     FDistanceToBoundaryOut.SliceCount = FHorizontalViewAngleOut.SliceCount = FVerticalViewAngleOut.SliceCount = FRangeOut.SliceCount = FDescriptionOut.SliceCount = FIsValidOut.SliceCount = count;
                     for (int i = 0; i < count; i++)
                     {
-                        Device dev = FDeviceListIn[0][i];
+                        Device dev = devList[i];
                         FDistanceToBoundaryOut[i] = dev.DistanceToBoundary(pos);
                         FHorizontalViewAngleOut[i] = dev.HorizontalViewAngle;
                         FVerticalViewAngleOut[i] = dev.VerticalViewAngle;

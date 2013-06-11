@@ -66,11 +66,8 @@ namespace VVVV.Nodes.Devices.Leap
 		[OutputAttribute("Timestamp")]
 		ISpread<double> FTimeStampOut;
 
-        [Output("InteractionBox")]
-        ISpread<InteractionBox> FInteractionBoxOut;
-
-        [Output("Device List")]
-        ISpread<DeviceList> FDeviceListOut;
+        [Output("Controller")]
+        ISpread<Controller> FControllerOut;
 
 		//Fields
 		List<FullCircleGesture> FCircleGestures = new List<FullCircleGesture>();
@@ -88,8 +85,6 @@ namespace VVVV.Nodes.Devices.Leap
 		//called when data for any output pin is requested
 		public void Evaluate(int SpreadMax)
 		{
-
-
 			if(FLeapController.IsConnected)
 			{
 				Frame frame = FLeapController.Frame();
@@ -97,10 +92,8 @@ namespace VVVV.Nodes.Devices.Leap
 				FTimeStampOut[0] = (double)frame.Timestamp;
                 if (FInit)
                 {
-                    FDeviceListOut.SliceCount = 1;
-                    FDeviceListOut[0] = FLeapController.Devices;
-                    FInteractionBoxOut.SliceCount = 1;
-                    FInteractionBoxOut[0] = new InteractionBox(new IntPtr(Controller.getCPtr(FLeapController).Handle.ToInt64()), false);
+                    FControllerOut.SliceCount = 1;
+                    FControllerOut[0] = FLeapController;
                     FInit = false;
                 }
 
@@ -193,13 +186,9 @@ namespace VVVV.Nodes.Devices.Leap
 				FKeyTapGestureOut.SliceCount = 0;
 				FScreenTapGestureOut.SliceCount = 0;
 				FScreensOut.SliceCount = 0;
-                FInteractionBoxOut.SliceCount = 0;
-                FDeviceListOut.SliceCount = 0;
+                FControllerOut.SliceCount = 0;
                 FInit = true;
 			}
-			
-
-
 		}
 		
 
@@ -216,6 +205,11 @@ namespace VVVV.Nodes.Devices.Leap
 		{
 			return new Vector3D(v.x * 0.001, v.y * 0.001, v.z * -0.001);
 		}
+
+        public static Vector3D ToVector3DPosNoMult(this Vector v)
+        {
+            return new Vector3D(v.x, v.y, v.z * -1);
+        }
 		
 		public static Vector3D ToVector3DDir(this Vector v)
 		{
