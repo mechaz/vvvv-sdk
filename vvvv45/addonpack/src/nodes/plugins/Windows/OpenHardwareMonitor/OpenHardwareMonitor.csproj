@@ -55,8 +55,6 @@
       <HintPath>..\..\..\..\..\..\lib\core\System.ComponentModel.Composition.Codeplex.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="VVVV.Core">
       <HintPath>..\..\..\..\..\..\lib\core\VVVV.Core.dll</HintPath>
     </Reference>
@@ -65,9 +63,6 @@
     </Reference>
     <Reference Include="VVVV.Utils">
       <HintPath>..\..\..\..\..\..\lib\core\VVVV.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="VVVV.Utils3rdParty">
-      <HintPath>..\..\..\..\..\..\lib\core\VVVV.Utils3rdParty.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
