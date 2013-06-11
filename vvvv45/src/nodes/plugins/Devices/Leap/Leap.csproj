@@ -26,6 +26,7 @@
     <Compile Include="ConfigNode.cs" />
     <Compile Include="HandNode.cs" />
     <Compile Include="FullCircleGesture.cs" />
+    <Compile Include="InteractionBoxNode.cs" />
     <Compile Include="ScreenTapGestureNode.cs" />
     <Compile Include="KeyTapGestureNode.cs" />
     <Compile Include="SwipeGestureNode.cs" />

@@ -29,8 +29,9 @@ namespace VVVV.Nodes.Devices.Leap
         #region fields & pins
 
         #pragma warning disable 0649
-        
-        [Input("InteractionBox", IsSingle=true)]
+
+
+        [Input("InteractionBox", IsSingle = true)]
         IDiffSpread<InteractionBox> FInteractionBoxIn;
 
         [Output("Center")]
@@ -72,9 +73,7 @@ namespace VVVV.Nodes.Devices.Leap
                     FInit = true;
                 }
             }
-            
-            
-            
+
             if (FInteractionBoxIn[0] != null)
             {
 
@@ -82,7 +81,7 @@ namespace VVVV.Nodes.Devices.Leap
                 try
                 {
 
-                    FCenterOut[0] = FInteractionBox.Center.ToVector3DPosNoMult();
+                    FCenterOut[0] = FInteractionBox.Center.ToVector3DPos();
                     FDepthOut[0] = FInteractionBox.Depth;
                     FWidthOut[0] = FInteractionBox.Width;
                     FHeightOut[0] = FInteractionBox.Height;
@@ -90,10 +89,11 @@ namespace VVVV.Nodes.Devices.Leap
                 }
                 catch (Exception e)
                 {
-                    string s = e.Message;
+
                 }
-                
-            } else 
+
+            }
+            else
             {
                 FCenterOut.SliceCount = FDepthOut.SliceCount = FWidthOut.SliceCount = FHeightOut.SliceCount = FIsValidOut.SliceCount = 0;
             }
