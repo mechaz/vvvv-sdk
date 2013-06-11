@@ -55,6 +55,11 @@ namespace VVVV.Nodes
         [Input("FanController Enabled", DefaultBoolean = true, IsToggle = true)]
         IDiffSpread<bool> FFanControllerEnabled;
 
+        [Config("Components")]
+        IDiffSpread<string> FComponentsIn;
+
+        [Config("Params")]
+        IDiffSpread<string> FParamsIn;
 
         // filter by
         string[] FFilterTypeArray = { "None", "Voltage", "Clock", "Load", "Temperature", "Fan", "Flow", "Control", "Level", "Power", "Data", "Factor" };
@@ -89,6 +94,11 @@ namespace VVVV.Nodes
 		private SortedList<String,List<ISensor>> FInstances = new SortedList<String, List<ISensor>>();
 		private bool FInit = true;
         private bool FDoUpdate = false;
+        private bool FComponentsDefined = false;
+        private bool FParamsDefined = false;
+        private string[] FComponents;
+        private string[] FParams;
+        private List<string> FKeysList = new List<string>();
 
 		#endregion fields & pins
 
@@ -115,6 +125,38 @@ namespace VVVV.Nodes
 				FInit = false;
 			}
 
+            // check if config inputs have changed
+            if (FComponentsIn.IsChanged || FParamsIn.IsChanged)
+            {
+                if (FComponentsIn[0].Length > 0)
+                {
+                    FComponentsDefined = true;
+                    FComponents = FComponentsIn[0].Split(new char[] { ',' });
+                    for (int i = 0; i < FComponents.Length; i++)
+                    {
+                        FComponents[i] = FComponents[i].Trim().ToLower();
+                    }
+                }
+                else
+                {
+                    FComponentsDefined = false;
+                }
+
+                if (FParamsIn[0].Length > 0)
+                {
+                    FParamsDefined = true;
+                    FParams = FParamsIn[0].Split(new char[] { ',' });
+                    for (int i = 0; i < FParams.Length; i++)
+                    {
+                        FParams[i] = FParams[i].Trim().ToLower();
+                    }
+                }
+                else
+                {
+                    FParamsDefined = false;
+                }
+            }
+
             if (FCPUEnabled.IsChanged || FGPUEnabled.IsChanged || FHDDEnabled.IsChanged || FRAMEnabled.IsChanged || FFanControllerEnabled.IsChanged || FMainboardEnabled.IsChanged)
             {
                 FComputer.CPUEnabled = FCPUEnabled[0];
@@ -133,6 +175,7 @@ namespace VVVV.Nodes
 
 			if(FDoUpdate)
 			{
+                FKeysList.Clear();
 				ReadComputerHardware();
                 
 				int Counter = 0;
@@ -146,26 +189,97 @@ namespace VVVV.Nodes
                 foreach(List<ISensor> List in SensorLists)
 				{
 					FIdentifier.SliceCount = FHardware.SliceCount = FValue.SliceCount = FName.SliceCount = FUnit.SliceCount = Counter + List.Count;
-					foreach(ISensor Sensor in List)
-					{
-						FHardware[Counter] = Sensor.Hardware.Name;
-						FIdentifier[Counter] = Sensor.Identifier.ToString();
-						FName[Counter] = Sensor.Name;
-                        FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
-                        try
+
+
+                    if (FComponentsDefined && FParamsDefined)
+                    {
+                        // change this code here to select by copmonents
+                        foreach (ISensor Sensor in List)
                         {
-                            FValue[Counter] = (float)Sensor.Value;
+                            FHardware[Counter] = Sensor.Hardware.Name;
+                            // FIdentifier[Counter] = Sensor.Identifier.ToString();
+                            FIdentifier[Counter] = CreateZabbixKey(Sensor);
+                            FName[Counter] = Sensor.Name;
+                            FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
+                            try
+                            {
+                                FValue[Counter] = (float)Sensor.Value;
+                            }
+                            catch (Exception e)
+                            {
+                                FValue[Counter] = -1f;
+                            }
+                            Counter++;
                         }
-                        catch (Exception e) 
+                    }
+                    else
+                    {
+                        foreach (ISensor Sensor in List)
                         {
-                            FValue[Counter] = -1f;
+                            FHardware[Counter] = Sensor.Hardware.Name;
+                            FIdentifier[Counter] = Sensor.Identifier.ToString();
+                            FName[Counter] = Sensor.Name;
+                            FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
+                            try
+                            {
+                                FValue[Counter] = (float)Sensor.Value;
+                            }
+                            catch (Exception e)
+                            {
+                                FValue[Counter] = -1f;
+                            }
+                            Counter++;
                         }
-						Counter++;
-					}
+                    }
 				}
 			}
             FDoUpdate = false;
 		}
+
+        private string CreateZabbixKey(ISensor sensor)
+        {
+            int counter = 0;
+            string identifier = sensor.Identifier.ToString();
+            string comp = "";
+            string param = "";
+            foreach (string c in FComponents)
+            {
+                if (identifier.Contains(c)) 
+                    comp = c;
+            }
+            foreach (string p in FParams)
+            {
+                if (identifier.Contains(p))
+                    param = p;
+            }
+            string erg = "vvvv." + comp + "." + counter + "." + param;
+            while (FKeysList.Contains(erg)) 
+            {
+                counter += 1;
+                erg = "vvvv." + comp + "." + counter + "." + param;
+            }
+            FKeysList.Add(erg);
+            // string erg = "vvvv.gpu.0.temperature";
+            return erg;
+        }
+
+        // check if sensor identifier contains 
+        private bool ContainsComponentAndParam(ISensor sensor)
+        {
+            bool hasComp = false;
+            bool hasParam = false;
+            foreach (string s in FComponents) 
+            {
+                if (sensor.Identifier.ToString().ToLower().Contains(s))
+                    hasComp = true;
+            }
+            foreach (string s in FParams)
+            {
+                if (sensor.Identifier.ToString().ToLower().Contains(s))
+                    hasParam = true;
+            }
+            return hasComp && hasParam;
+        }
 
 		private void ReadComputerHardware()
 		{
@@ -189,13 +303,29 @@ namespace VVVV.Nodes
                     {
                         if (FFilter[0].Name.Equals(FFilterTypeArray[0]))
                         {
-                            SensorList.Add(Sensor);
+                            if (FComponentsDefined && FParamsDefined)
+                            {
+                                if (ContainsComponentAndParam(Sensor))
+                                    SensorList.Add(Sensor);
+                            }
+                            else
+                            {
+                                SensorList.Add(Sensor);
+                            }
                         }
                         else
                         {
                             if (Sensor.SensorType.ToString().Equals(FFilter[0].Name))
                             {
-                                SensorList.Add(Sensor);
+                                if (FComponentsDefined && FParamsDefined)
+                                {
+                                    if (ContainsComponentAndParam(Sensor))
+                                        SensorList.Add(Sensor);
+                                }
+                                else
+                                {
+                                    SensorList.Add(Sensor);
+                                }
                             }
                         }
                         
