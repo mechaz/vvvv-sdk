@@ -69,9 +69,15 @@ namespace VVVV.Nodes
 		[Output("Hardware")]
 		ISpread<string> FHardware;
 
+        [Output("Hardware Type")]
+        ISpread<string> FHardwareType;
+
 		[Output("Identifier")]
 		ISpread<string> FIdentifier;
-		
+
+        [Output("IdentifierZabbix")]
+        ISpread<string> FIdentifierZabbix;
+
 		[Output("Name")]
 		ISpread<string> FName;
 		
@@ -179,16 +185,17 @@ namespace VVVV.Nodes
 				ReadComputerHardware();
                 
 				int Counter = 0;
+                int CounterZbx = 0;
 				IList<List<ISensor>> SensorLists= FInstances.Values;
 
                 if (SensorLists.Count == 0)
                 {
-                    FIdentifier.SliceCount = FHardware.SliceCount = FValue.SliceCount = FUnit.SliceCount = FName.SliceCount = 0;
+                    FIdentifier.SliceCount = FIdentifierZabbix.SliceCount = FHardware.SliceCount = FHardwareType.SliceCount = FValue.SliceCount = FUnit.SliceCount = FName.SliceCount = 0;
                 }
 
                 foreach(List<ISensor> List in SensorLists)
 				{
-					FIdentifier.SliceCount = FHardware.SliceCount = FValue.SliceCount = FName.SliceCount = FUnit.SliceCount = Counter + List.Count;
+                    FIdentifier.SliceCount = FIdentifierZabbix.SliceCount = FHardware.SliceCount = FHardwareType.SliceCount = FValue.SliceCount = FName.SliceCount = FUnit.SliceCount = Counter + List.Count;
 
 
                     if (FComponentsDefined && FParamsDefined)
@@ -197,8 +204,9 @@ namespace VVVV.Nodes
                         foreach (ISensor Sensor in List)
                         {
                             FHardware[Counter] = Sensor.Hardware.Name;
-                            // FIdentifier[Counter] = Sensor.Identifier.ToString();
-                            FIdentifier[Counter] = CreateZabbixKey(Sensor);
+                            FHardwareType[Counter] = Sensor.Hardware.HardwareType.ToString();
+                            FIdentifier[Counter] = Sensor.Identifier.ToString();
+                            FIdentifierZabbix[Counter] = CreateZabbixKey(Sensor);
                             FName[Counter] = Sensor.Name;
                             FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
                             try
@@ -217,6 +225,7 @@ namespace VVVV.Nodes
                         foreach (ISensor Sensor in List)
                         {
                             FHardware[Counter] = Sensor.Hardware.Name;
+                            FHardwareType[Counter] = Sensor.Hardware.HardwareType.ToString();
                             FIdentifier[Counter] = Sensor.Identifier.ToString();
                             FName[Counter] = Sensor.Name;
                             FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
@@ -294,6 +303,7 @@ namespace VVVV.Nodes
 		private void ComputerHardwareAdded(IHardware Hardware)
 		{
             string t = Hardware.Identifier.ToString();
+            
 			if (!Exists(Hardware.Identifier.ToString()))
 			{
 				List<ISensor> SensorList = new List<ISensor>();
@@ -303,29 +313,29 @@ namespace VVVV.Nodes
                     {
                         if (FFilter[0].Name.Equals(FFilterTypeArray[0]))
                         {
-                            if (FComponentsDefined && FParamsDefined)
-                            {
-                                if (ContainsComponentAndParam(Sensor))
-                                    SensorList.Add(Sensor);
-                            }
-                            else
-                            {
+                            //if (FComponentsDefined && FParamsDefined)
+                            //{
+                            //    if (ContainsComponentAndParam(Sensor))
+                            //        SensorList.Add(Sensor);
+                            //}
+                            //else
+                            //{
                                 SensorList.Add(Sensor);
-                            }
+                            //}
                         }
                         else
                         {
                             if (Sensor.SensorType.ToString().Equals(FFilter[0].Name))
                             {
-                                if (FComponentsDefined && FParamsDefined)
-                                {
-                                    if (ContainsComponentAndParam(Sensor))
-                                        SensorList.Add(Sensor);
-                                }
-                                else
-                                {
+                                // if (FComponentsDefined && FParamsDefined)
+                                // {
+                                //    if (ContainsComponentAndParam(Sensor))
+                                //        SensorList.Add(Sensor);
+                                // }
+                                // else
+                                //{
                                     SensorList.Add(Sensor);
-                                }
+                                // }
                             }
                         }
                         
