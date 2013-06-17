@@ -104,7 +104,12 @@ namespace VVVV.Nodes
         private bool FParamsDefined = false;
         private string[] FComponents;
         private string[] FParams;
-        private List<string> FKeysList = new List<string>();
+        private List<string> FSensorKeys = new List<string>();
+
+        private SortedList<String, HardwareType> FHardwareTypes = new SortedList<string, HardwareType>();
+        private SortedList<String, IHardware> FHardwareInstances = new SortedList<string, IHardware>();
+
+        private SortedList<String, String> FBaseKeys = new SortedList<String, String>();
 
 		#endregion fields & pins
 
@@ -181,11 +186,11 @@ namespace VVVV.Nodes
 
 			if(FDoUpdate)
 			{
-                FKeysList.Clear();
+                FSensorKeys.Clear();
 				ReadComputerHardware();
+                CreateBaseKeys();
                 
 				int Counter = 0;
-                int CounterZbx = 0;
 				IList<List<ISensor>> SensorLists= FInstances.Values;
 
                 if (SensorLists.Count == 0)
@@ -206,7 +211,9 @@ namespace VVVV.Nodes
                             FHardware[Counter] = Sensor.Hardware.Name;
                             FHardwareType[Counter] = Sensor.Hardware.HardwareType.ToString();
                             FIdentifier[Counter] = Sensor.Identifier.ToString();
-                            FIdentifierZabbix[Counter] = CreateZabbixKey(Sensor);
+                            
+                            // FIdentifierZabbix[Counter] = CreateZabbixKey(Sensor);
+                            FIdentifierZabbix[Counter] = GetBaseKey(Sensor.Hardware) + "." + Sensor.SensorType.ToString() + "." + Sensor.Index;
                             FName[Counter] = Sensor.Name;
                             FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
                             try
@@ -245,12 +252,14 @@ namespace VVVV.Nodes
             FDoUpdate = false;
 		}
 
-        private string CreateZabbixKey(ISensor sensor)
+        private string CreateSensorKey(ISensor sensor)
         {
             int counter = 0;
             string identifier = sensor.Identifier.ToString();
             string comp = "";
             string param = "";
+
+
             foreach (string c in FComponents)
             {
                 if (identifier.Contains(c)) 
@@ -262,15 +271,47 @@ namespace VVVV.Nodes
                     param = p;
             }
             string erg = "vvvv." + comp + "." + counter + "." + param;
-            while (FKeysList.Contains(erg)) 
+            while (FSensorKeys.Contains(erg)) 
             {
                 counter += 1;
                 erg = "vvvv." + comp + "." + counter + "." + param;
             }
-            FKeysList.Add(erg);
+            FSensorKeys.Add(erg);
+            
             // string erg = "vvvv.gpu.0.temperature";
             return erg;
         }
+
+
+        private string CreateSensorKey_2(ISensor sensor)
+        {
+            int counter = 0;
+            string identifier = sensor.Identifier.ToString();
+            int f = sensor.Index;
+            string st = sensor.SensorType.ToString();
+            string comp = "";
+            string param = "";
+            foreach (string c in FComponents)
+            {
+                if (identifier.Contains(c))
+                    comp = c;
+            }
+            foreach (string p in FParams)
+            {
+                if (identifier.Contains(p))
+                    param = p;
+            }
+            string erg = "vvvv." + comp + "." + counter + "." + param;
+            while (FSensorKeys.Contains(erg))
+            {
+                counter += 1;
+                erg = "vvvv." + comp + "." + counter + "." + param;
+            }
+            FSensorKeys.Add(erg);
+            // string erg = "vvvv.gpu.0.temperature";
+            return erg;
+        }
+
 
         // check if sensor identifier contains 
         private bool ContainsComponentAndParam(ISensor sensor)
@@ -293,6 +334,9 @@ namespace VVVV.Nodes
 		private void ReadComputerHardware()
 		{
 			FInstances.Clear();
+            FHardwareTypes.Clear();
+            FHardwareInstances.Clear();
+            FBaseKeys.Clear();
             foreach (IHardware Hardware in FComputer.Hardware)
             {
                 Hardware.Update();
@@ -313,35 +357,21 @@ namespace VVVV.Nodes
                     {
                         if (FFilter[0].Name.Equals(FFilterTypeArray[0]))
                         {
-                            //if (FComponentsDefined && FParamsDefined)
-                            //{
-                            //    if (ContainsComponentAndParam(Sensor))
-                            //        SensorList.Add(Sensor);
-                            //}
-                            //else
-                            //{
-                                SensorList.Add(Sensor);
-                            //}
+                            SensorList.Add(Sensor);
                         }
                         else
                         {
                             if (Sensor.SensorType.ToString().Equals(FFilter[0].Name))
                             {
-                                // if (FComponentsDefined && FParamsDefined)
-                                // {
-                                //    if (ContainsComponentAndParam(Sensor))
-                                //        SensorList.Add(Sensor);
-                                // }
-                                // else
-                                //{
-                                    SensorList.Add(Sensor);
-                                // }
+                                SensorList.Add(Sensor);
                             }
                         }
                         
                     }
                 }			
 				FInstances.Add(Hardware.Identifier.ToString(),SensorList);
+                FHardwareTypes.Add(Hardware.Identifier.ToString(), Hardware.HardwareType);
+                FHardwareInstances.Add(Hardware.Identifier.ToString(), Hardware);
 			}
 
             foreach (IHardware subHardware in Hardware.SubHardware)
@@ -350,6 +380,28 @@ namespace VVVV.Nodes
                 ComputerHardwareAdded(subHardware);
             }
 		}
+
+        private void CreateBaseKeys()
+        {
+            foreach (KeyValuePair<String, IHardware> kvpHardware in FHardwareInstances)
+            {
+                int counter = 0;
+                string erg = "vvvv." + kvpHardware.Value.HardwareType.ToString() + "." + counter;
+                while (FBaseKeys.ContainsValue(erg))
+                {
+                    counter += 1;
+                    erg = "vvvv." + kvpHardware.Value.HardwareType.ToString() + "." + counter;
+                }
+                FBaseKeys.Add(kvpHardware.Value.Identifier.ToString(), erg);
+            }
+        }
+
+        private string GetBaseKey(IHardware hardware)
+        {
+            string s = "";
+            bool exists = FBaseKeys.TryGetValue(hardware.Identifier.ToString(), out s);
+            return s;
+        }
 		
 		private bool Exists(string Identifier) {
 			return FInstances.ContainsKey(Identifier);
