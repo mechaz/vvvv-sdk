@@ -75,8 +75,8 @@ namespace VVVV.Nodes
 		[Output("Identifier")]
 		ISpread<string> FIdentifier;
 
-        [Output("IdentifierZabbix")]
-        ISpread<string> FIdentifierZabbix;
+        [Output("Zabbix Identifier")]
+        ISpread<string> FZabbixIdentifier;
 
 		[Output("Name")]
 		ISpread<string> FName;
@@ -195,12 +195,12 @@ namespace VVVV.Nodes
 
                 if (SensorLists.Count == 0)
                 {
-                    FIdentifier.SliceCount = FIdentifierZabbix.SliceCount = FHardware.SliceCount = FHardwareType.SliceCount = FValue.SliceCount = FUnit.SliceCount = FName.SliceCount = 0;
+                    FIdentifier.SliceCount = FZabbixIdentifier.SliceCount = FHardware.SliceCount = FHardwareType.SliceCount = FValue.SliceCount = FUnit.SliceCount = FName.SliceCount = 0;
                 }
 
                 foreach(List<ISensor> List in SensorLists)
 				{
-                    FIdentifier.SliceCount = FIdentifierZabbix.SliceCount = FHardware.SliceCount = FHardwareType.SliceCount = FValue.SliceCount = FName.SliceCount = FUnit.SliceCount = Counter + List.Count;
+                    FIdentifier.SliceCount = FZabbixIdentifier.SliceCount = FHardware.SliceCount = FHardwareType.SliceCount = FValue.SliceCount = FName.SliceCount = FUnit.SliceCount = Counter + List.Count;
 
 
                     if (FComponentsDefined && FParamsDefined)
@@ -211,9 +211,8 @@ namespace VVVV.Nodes
                             FHardware[Counter] = Sensor.Hardware.Name;
                             FHardwareType[Counter] = Sensor.Hardware.HardwareType.ToString();
                             FIdentifier[Counter] = Sensor.Identifier.ToString();
-                            
-                            // FIdentifierZabbix[Counter] = CreateZabbixKey(Sensor);
-                            FIdentifierZabbix[Counter] = GetBaseKey(Sensor.Hardware) + "." + Sensor.SensorType.ToString() + "." + Sensor.Index;
+
+                            FZabbixIdentifier[Counter] = GetBaseKey(Sensor.Hardware) + "." + Sensor.SensorType.ToString() + "." + Sensor.Index;
                             FName[Counter] = Sensor.Name;
                             FUnit[Counter] = SensorTypeToUnit(Sensor.SensorType);
                             try
@@ -252,37 +251,6 @@ namespace VVVV.Nodes
             FDoUpdate = false;
 		}
 
-        private string CreateSensorKey(ISensor sensor)
-        {
-            int counter = 0;
-            string identifier = sensor.Identifier.ToString();
-            string comp = "";
-            string param = "";
-
-
-            foreach (string c in FComponents)
-            {
-                if (identifier.Contains(c)) 
-                    comp = c;
-            }
-            foreach (string p in FParams)
-            {
-                if (identifier.Contains(p))
-                    param = p;
-            }
-            string erg = "vvvv." + comp + "." + counter + "." + param;
-            while (FSensorKeys.Contains(erg)) 
-            {
-                counter += 1;
-                erg = "vvvv." + comp + "." + counter + "." + param;
-            }
-            FSensorKeys.Add(erg);
-            
-            // string erg = "vvvv.gpu.0.temperature";
-            return erg;
-        }
-
-
         private string CreateSensorKey_2(ISensor sensor)
         {
             int counter = 0;
@@ -308,7 +276,6 @@ namespace VVVV.Nodes
                 erg = "vvvv." + comp + "." + counter + "." + param;
             }
             FSensorKeys.Add(erg);
-            // string erg = "vvvv.gpu.0.temperature";
             return erg;
         }
 
@@ -400,6 +367,10 @@ namespace VVVV.Nodes
         {
             string s = "";
             bool exists = FBaseKeys.TryGetValue(hardware.Identifier.ToString(), out s);
+            if (s.Contains(HardwareType.GpuAti.ToString()))
+                s = s.Replace("GpuAti", "GPU");
+            if (s.Contains(HardwareType.GpuNvidia.ToString()))
+                s = s.Replace("GpuNvidia", "GPU");
             return s;
         }
 		
