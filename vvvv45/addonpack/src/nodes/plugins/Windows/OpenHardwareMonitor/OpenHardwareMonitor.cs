@@ -320,8 +320,8 @@ namespace VVVV.Nodes
 				List<ISensor> SensorList = new List<ISensor>();
                 foreach (ISensor Sensor in Hardware.Sensors)
                 {
-                    if (!Sensor.IsDefaultHidden)
-                    {
+                    // if (!Sensor.IsDefaultHidden)
+                    //{
                         if (FFilter[0].Name.Equals(FFilterTypeArray[0]))
                         {
                             SensorList.Add(Sensor);
@@ -334,7 +334,7 @@ namespace VVVV.Nodes
                             }
                         }
                         
-                    }
+                    // }
                 }			
 				FInstances.Add(Hardware.Identifier.ToString(),SensorList);
                 FHardwareTypes.Add(Hardware.Identifier.ToString(), Hardware.HardwareType);
