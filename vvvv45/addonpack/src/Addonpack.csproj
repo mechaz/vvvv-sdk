@@ -261,6 +261,10 @@
       <Project>{F00225CD-B9C7-4450-8B44-1C2F07740CAD}</Project>
       <Name>RS232</Name>
     </ProjectReference>
+    <ProjectReference Include="nodes\plugins\Devices\ServoControl\ServoControl.csproj">
+      <Project>{9142CB5C-D8C6-472A-8BFB-489030618279}</Project>
+      <Name>ServoControl</Name>
+    </ProjectReference>
     <ProjectReference Include="nodes\plugins\Devices\SpaceMouse\SpaceMouse.csproj">
       <Project>{3DCB2548-413F-4B0C-9246-1B3A554FC80E}</Project>
       <Name>SpaceMouse</Name>
