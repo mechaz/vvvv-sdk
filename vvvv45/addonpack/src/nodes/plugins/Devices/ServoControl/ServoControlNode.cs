@@ -1,6 +1,7 @@
 #region usings
 using System;
 using System.ComponentModel.Composition;
+using System.Windows.Forms;
 
 using VVVV.PluginInterfaces.V1;
 using VVVV.PluginInterfaces.V2;
@@ -19,17 +20,12 @@ namespace VVVV.Nodes
 	public class ServoControlNode : IPluginEvaluate
 	{
 		#region fields & pins
-		[Input("Input", DefaultValue = 1.0)]
-		ISpread<double> FInput;
 
         [Input("Update Status", IsBang=true)]
         IDiffSpread<bool> FInUpdateStatus;
 
-        [Input("COM Port")]
-        IDiffSpread<double> FInCOMPort;
-
-		[Output("Output")]
-		ISpread<double> FOutput;
+        [Input("Set COMPort")]
+        IDiffSpread<bool> FInSetCOMPort;
 
         [Output("Error Int")]
         ISpread<int> FOutErrorInt;
@@ -47,6 +43,9 @@ namespace VVVV.Nodes
         public static Servo servo;
         
         private bool FConnected = false;
+        private bool FCOMConfigChanged = false;
+
+        private bool FInit = true;
 
         // ???
         private const string sConfigKey = "\\Software\\MyCompany\\Sample\\CommSerial";
@@ -61,42 +60,44 @@ namespace VVVV.Nodes
 		//called when data for any output pin is requested
 		public void Evaluate(int SpreadMax)
 		{
-			FOutput.SliceCount = SpreadMax;
             FOutConfig.SliceCount = FOutErrorInt.SliceCount = 1;
 
-            if (FInUpdateStatus.IsChanged && FInUpdateStatus[0] == true)
+            if (FInSetCOMPort.IsChanged && FInSetCOMPort[0] || FInit)
             {
-                string conf = "COM5, auto, ESR prot.";
-                int erg = servo.SetConfig(conf);
-                servo.LoadConfig(sConfigKey);
-
-                servo.Config(null);
-
+                // string conf = "COM5, auto, ESR prot.";
+                // servo.SetConfig(conf);
+                int jep = servo.LoadConfig(sConfigKey);
+                //if (jep != 0)
+                //{
+                    Form f = new Form();
+                    servo.Config(f);
+                    servo.SaveConfig(sConfigKey);
+                //}
                 FOutConfig[0] = GetConfigString();
+                FCOMConfigChanged = true;
+                if (FInit)
+                    FInit = false;
+            }
 
-
-
-
-
+            if ((FInUpdateStatus.IsChanged && FInUpdateStatus[0] == true) || FCOMConfigChanged)
+            {
                 int rc;
 
                 if ((rc = servo.Connect()) == 0) // Vebindungsaufbau ok?
                 {
-                    FConnected = true;              // Status merken
-                    // EnableControls();     // Controls entsprechend aktivieren
+                    FConnected = true;
+                }
+                else
+                {
+                    FConnected = false;
                 }
                 FOutErrorInt[0] = rc;
-
-                
             }
-
+            FCOMConfigChanged = false;
             FOutIsConnected[0] = FConnected;
-
-            for (int i = 0; i < SpreadMax; i++)
-            {
-                FOutput[i] = FInput[i] * 2;
-            }
 		}
+
+
 
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
