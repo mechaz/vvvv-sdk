@@ -18,7 +18,7 @@ namespace VVVV.Nodes
     /// <summary>
     /// Implements the CommLib extension class for the driver dll functions
     /// </summary>
-    public class Servo : CommLib
+    public class Servo: CommLib
     {
         public const int servoErr_Fault = (-1);        // Servo in state "fault"
         public const int servoErr_Timeout = (-2);        // Function timeout
@@ -58,17 +58,17 @@ namespace VVVV.Nodes
         /// <seealso cref="WriteOperationMode"/>
         public enum TOperationMode : sbyte
         {
-            omUndefined = 0,
-            omPositionMode = 1,   // Profile position mode
-            omVelocityMode = 3,   // Velocity mode
-            omVelocityModeDirect = -3,   // Velocity mode direct
-            omTorqueMode = 4,   // Torque mode
-            omHomingMode = 6,   // Homing mode
-            omElectronicGear = -1,   // Electronic gearing mode
-            omFlyingShear = -2,   // Flying shear mode
-            omInterpolPosMode = 7,   // Interpolated position mode
-            omVelocityProfile = -4,   // Velocity profile mode
-            omCamdisk = -5    // Cam disc mode
+            omUndefined            =  0,
+            omPositionMode         =  1,   // Profile position mode
+            omVelocityMode         =  3,   // Velocity mode
+            omVelocityModeDirect   = -3,   // Velocity mode direct
+            omTorqueMode           =  4,   // Torque mode
+            omHomingMode           =  6,   // Homing mode
+            omElectronicGear       = -1,   // Electronic gearing mode
+            omFlyingShear          = -2,   // Flying shear mode
+            omInterpolPosMode      =  7,   // Interpolated position mode
+            omVelocityProfile      = -4,   // Velocity profile mode
+            omCamdisk              = -5    // Cam disc mode
         };
 
         private const ushort cltrWord_PosNew = 0x0010;      // Set new position
@@ -144,7 +144,7 @@ namespace VVVV.Nodes
         {
             return WriteControlWord(unchecked((ushort)cw));
         }
-
+        
         /// <summary>
         /// Read actual operation mode
         /// </summary>
@@ -160,7 +160,7 @@ namespace VVVV.Nodes
 
             return rc;
         }
-
+        
         /// <summary>
         /// Set new operation mode
         /// </summary>
@@ -210,29 +210,28 @@ namespace VVVV.Nodes
 
             DateTime tout = DateTime.Now + new TimeSpan(0, 0, 0, 0, timeout);
 
-            while (!b_done && (rc == 0))
+            while(!b_done && (rc == 0))
             {
                 // Read status word and check for state "fault"
-                if ((rc = ReadStatusWord(out us_status)) != 0) break;
-                if ((cmd != TStateCmd.cmdResetFault) && isFault(us_status))
-                {
+                if ( (rc = ReadStatusWord(out us_status)) != 0) break;
+                if ((cmd != TStateCmd.cmdResetFault) && isFault(us_status)) {
                     rc = servoErr_Fault;
                     break;
                 }
 
                 // evaluate command
-                switch (cmd)
+                switch(cmd)
                 {
-                    case TStateCmd.cmdShutdown:     // Shutdown -> Ready to switch on
-                        if (!isRdyToSwitchOn(us_status))    // state reached?
+                    case TStateCmd.cmdShutdown :     // Shutdown -> Ready to switch on
+                        if ( !isRdyToSwitchOn(us_status) )    // state reached?
                         {
-                            if (isSwitchOnDisabled(us_status) ||
-                                 isSwitchedOn(us_status) ||
+                            if ( isSwitchOnDisabled(us_status) ||
+                                 isSwitchedOn(us_status)       ||
                                  isOperationEnabled(us_status))
                             {
                                 // Shutdown
                                 if ((rc = ReadControlWord(out us_control)) != 0) break;
-                                if ((rc = WriteControlWord((us_control & 0xfff0) | 0x06)) != 0) break;
+                                if ((rc = WriteControlWord( (us_control & 0xfff0) | 0x06)) != 0) break;
                             }
                         }
                         else
@@ -240,23 +239,20 @@ namespace VVVV.Nodes
                         break;
 
                     case TStateCmd.cmdSwitchOn: // Switchon -> Swicthed on
-                        if (!isSwitchedOn(us_status))   // state reached?
+                        if ( !isSwitchedOn(us_status) )   // state reached?
                         {
                             if ((rc = ReadControlWord(out us_control)) != 0) break;
-                            if (isSwitchOnDisabled(us_status))
-                            {
+                            if (isSwitchOnDisabled(us_status)) {
                                 // shut down
-                                if ((rc = WriteControlWord((us_control & 0xfff0) | 0x06)) != 0) break;
+                                if ((rc = WriteControlWord( (us_control & 0xfff0) | 0x06 )) != 0) break;
                             }
                             else
-                                if (isOperationEnabled(us_status))
-                                {
+                                if (isOperationEnabled(us_status)) {
                                     // Disable operation
-                                    if ((rc = WriteControlWord((us_control & 0xfff0) | 0x07)) != 0) break;
+                                    if ((rc = WriteControlWord( (us_control & 0xfff0) | 0x07)) != 0) break;
                                 }
                                 else
-                                    if (isRdyToSwitchOn(us_status))
-                                    {
+                                    if (isRdyToSwitchOn(us_status)) {
                                         // Switch on
                                         if ((rc = WriteControlWord((us_control & 0xfff8) | 0x07)) != 0) break;
                                     }
@@ -280,26 +276,23 @@ namespace VVVV.Nodes
                         break;
 
                     case TStateCmd.cmdDisableOperation: // Disable operation -> Switched on
-                        if (!isSwitchedOn(us_status))   //state reached?
+                        if ( !isSwitchedOn(us_status) )   //state reached?
                         {
                             if ((rc = ReadControlWord(out us_control)) != 0) break;
-                            if (isSwitchOnDisabled(us_status))
-                            {
+                            if (isSwitchOnDisabled(us_status)) {
                                 // Shut down
                                 if ((rc = WriteControlWord((us_control & 0xfff8) | 0x06)) != 0) break;
                             }
                             else
-                                if (isRdyToSwitchOn(us_status))
-                                {
+                                if (isRdyToSwitchOn(us_status)) {
                                     // Switch on
                                     if ((rc = WriteControlWord((us_control & 0xfff8) | 0x07)) != 0) break;
                                 }
-                                else
-                                    if (isOperationEnabled(us_status))
-                                    {
-                                        // Disable operation
-                                        if ((rc = WriteControlWord((us_control & 0xfff0) | 0x07)) != 0) break;
-                                    }
+                            else
+                                if (isOperationEnabled(us_status)) {
+                                    // Disable operation
+                                    if ((rc = WriteControlWord((us_control & 0xfff0) | 0x07)) != 0) break;
+                                }
                         }
                         else
                             b_done = true; // command finished
@@ -309,20 +302,17 @@ namespace VVVV.Nodes
                         if (!isOperationEnabled(us_status))   // state reached?
                         {
                             if ((rc = ReadControlWord(out us_control)) != 0) break;
-                            if (isSwitchOnDisabled(us_status))
-                            {
+                            if (isSwitchOnDisabled(us_status)) {
                                 // Shut down
                                 if ((rc = WriteControlWord((us_control & 0xfff8) | 0x06)) != 0) break;
                             }
                             else
-                                if (isRdyToSwitchOn(us_status))
-                                {
+                                if (isRdyToSwitchOn(us_status)) {
                                     // Switch on
                                     if ((rc = WriteControlWord((us_control & 0xfff8) | 0x07)) != 0) break;
                                 }
                                 else
-                                    if (isSwitchedOn(us_status))
-                                    {
+                                    if (isSwitchedOn(us_status)) {
                                         // Enable operation
                                         if ((rc = WriteControlWord((us_control | 0x0f))) != 0) break;
                                     }
@@ -340,7 +330,7 @@ namespace VVVV.Nodes
                         break;
 
                     case TStateCmd.cmdTPStart:      // Start part program
-                        if (isTPIdle(us_status) ||   // PP is IDLE
+                        if ( isTPIdle(us_status) ||   // PP is IDLE
                              isTPPaused(us_status))   // TP is PAUSED
                         {
                             if ((rc = ReadControlWord(out us_control)) != 0) break;
@@ -375,7 +365,7 @@ namespace VVVV.Nodes
                         b_done = true; // command finished
                         break;
 
-                    default:   // unknown command
+                    default :   // unknown command
                         b_done = true;  // command finished
                         break;
                 }
@@ -384,8 +374,7 @@ namespace VVVV.Nodes
                     break;
 
                 // Timeout prüfen
-                if (DateTime.Now >= tout)
-                {        // Timeout?
+                if (DateTime.Now >= tout) {        // Timeout?
                     rc = servoErr_Timeout;        // Timeout error
                     break;
                 }

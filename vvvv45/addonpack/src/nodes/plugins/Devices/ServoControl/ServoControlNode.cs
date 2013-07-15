@@ -20,16 +20,31 @@ namespace VVVV.Nodes
 	public class ServoControlNode : IPluginEvaluate
 	{
 		#region fields & pins
-
+		const string AXISSTATE_ENUM_NAME = "AxisState";
+		
         [Input("Update Status", IsBang=true)]
         IDiffSpread<bool> FInUpdateStatus;
 
         [Input("Set COMPort")]
         IDiffSpread<bool> FInSetCOMPort;
 
-        [Input("Send 0 Pos abs", IsBang=true)]
-        IDiffSpread<bool> FInSendPos0Abs;
-
+        [Input("Send Data", IsBang=true)]
+        IDiffSpread<bool> FInSendData;
+        
+        [Input("Axis State", EnumName = AXISSTATE_ENUM_NAME, Order = 2)]
+        ISpread<EnumEntry> FInAxisState;
+        
+        [Input("Reset Position", IsBang=true)]
+        IDiffSpread<bool> FInSendResetPos;
+        
+        [Input("Set Velocity")]
+        IDiffSpread<int> FInSetVel;
+        
+		[Input("Set Position")]
+        IDiffSpread<int> FInSetPos;
+        
+		[Input("Absolute")]
+        IDiffSpread<bool> FInSetAbsolute;
 
         [Output("Error Int")]
         ISpread<int> FOutErrorInt;
@@ -43,6 +58,14 @@ namespace VVVV.Nodes
         [Output("Error Message")]
         ISpread<string> FOutErrorMessage;
 
+        [Output("Control Word")]
+        ISpread<string> FOutCW;
+
+        [Output("Status Word")]
+        ISpread<string> FOutSW;
+
+        [Output("Position")]
+        ISpread<int> FOutPosition;
 
 		[Import()]
 		ILogger FLogger;
@@ -62,17 +85,36 @@ namespace VVVV.Nodes
         public ServoControlNode()
         {
             servo = new Servo();
+			
+            string[] AxisStates = new string[]
+            {
+			"Disable voltage",
+			"Quick stop",
+			"Shut down",
+			"Switch on",
+			"Enable operation",
+			"Disable operation",
+			"Reset fault"
+			};
+			EnumManager.UpdateEnum(AXISSTATE_ENUM_NAME,"", AxisStates);
         }
-
+		
 		//called when data for any output pin is requested
+		private string GetConfigString()
+	        {
+	            string s_conf;
+	
+	            servo.GetConfigString(out s_conf);
+	            return s_conf; 
+	        }
 		public void Evaluate(int SpreadMax)
 		{
             FOutConfig.SliceCount = FOutErrorInt.SliceCount = 1;
             FOutErrorMessage.SliceCount = 1;
-
-            // -----------------------------------------------------------------------
-            // -----------------------------------------------------------------------
             
+            // -----------------------------------------------------------------------
+            // -----------------------------------------------------------------------
+	        
             if (FInSetCOMPort.IsChanged && FInSetCOMPort[0] || FInit)
             {
                 // string conf = "COM5, auto, ESR prot.";
@@ -97,6 +139,7 @@ namespace VVVV.Nodes
                 if ((rc = servo.Connect()) == 0) // Vebindungsaufbau ok?
                 {
                     FConnected = true;
+                    
                 }
                 else
                 {
@@ -106,31 +149,54 @@ namespace VVVV.Nodes
             }
             FCOMConfigChanged = false;
             FOutIsConnected[0] = FConnected;
-            
-            // -----------------------------------------------------------------------
-            // -----------------------------------------------------------------------
-
-            if (FInSendPos0Abs.IsChanged && FInSendPos0Abs[0])
+            //read out position
+            if (FConnected == true)
             {
-                DoSetPos("0", true);
+				int pos;
+				if (servo.ReadPos(out pos) == 0)
+				{
+					FOutPosition[0] = pos;
+				}
+				if (FInSendResetPos.IsChanged && FInSendResetPos[0] == true)
+				{
+					int rc;
+					if ((rc = servo.ResetPos()) != 0)
+					{
+						FOutErrorMessage[0] = "Reset position failed!";
+						return;
+					}
+				}
+				/*if (servo.ReadControlWord(out us_control) == 0)
+	            {
+	                FOutCW[0] = string.Format("{0:x4}", us_control);
+	            }*/
+        
+				//FInAxisState[0].Index
+            }
+           
+            // -----------------------------------------------------------------------
+            // -----------------------------------------------------------------------
+            if (FInSendData.IsChanged && FInSendData[0])
+            {
+            	DoSetPos(FInSetPos[0],FInSetVel[0],FInSetAbsolute[0]);
             }
 		}
 
-
-        private void DoSetPos(string text, bool absolute)
+		
+        private void DoSetPos(int pos, int vel, bool absolute)
         {
             int rc;
             ushort us_status;
-            int pos, vel;
+            
 
             // Read status word
             if ((rc = servo.ReadStatusWord(out us_status)) != 0)
             {
-                FOutErrorMessage[0] = "Reading axis state failed!";
+                FOutErrorMessage[0] = "Reading axis state failed! (aka nicht verbunden)";
                 return;
             }
             // Check for state "operation enabled"
-            if (!Servo.isOperationEnabled(us_status))
+			if (!Servo.isOperationEnabled(us_status))
             {
                 // Switch to state "operation enabled"
                 if ((rc = servo.SetStateMachine(Servo.TStateCmd.cmdEnableOperation, 500)) != 0)
@@ -138,76 +204,86 @@ namespace VVVV.Nodes
                     FOutErrorMessage[0] = "Switch to \"Operation enabled\" failed.";
                     return;
                 }
-            }
-            int r = 2;
-            // Read target position from user entry
-            try
-            {
-                pos = Convert.ToInt32(text);
-                int a = 6;
-            }
-            catch
-            {
-                FOutErrorMessage[0] = "is not a valid number";
-                MessageBox.Show(
-                    "'" + text + "' is not a valid number",
-                    "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
-            // Read velocityfrom user entry
-            try
-            {
-                vel = Convert.ToInt32(text);
-            }
-            catch
-            {
-                FOutErrorMessage[0] = "is not a valid number";
-                MessageBox.Show(
-                    "'" + text + "' is not a valid number",
-                    "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-
+			}
+            
             // Set new velocity
             if ((rc = servo.SetVelocity(vel)) != 0)
             {
                 FOutErrorMessage[0] = "Set new velocity failed!";
                 return;
             }
-
+            //bool myAbsolute = false;
             // Set new target position
+            //servo.SetPos(pos, absolute);
             if ((rc = servo.SetPos(pos, absolute)) != 0)
             {
                 FOutErrorMessage[0] = "Set new position failed!";
-            } 
+                return;
+            }
         }
 
+       
 
+        /* private string sItem;
+            private Servo.TStateCmd cmd;
 
+		private void UpdateActualState()
+        {
+            ushort us_status, us_control;
 
+            if (servo.ReadStatusWord(out us_status) == 0)
+            {
+            	FOutSW[0] = string.Format("{0:x4}", us_status);
 
+                string s_state;
 
+                 // Convert axis state to human readable string
+                if (Servo.isSwitchOnDisabled(us_status))
+                    s_state = "Switch on disabled";
+                else if (Servo.isRdyToSwitchOn(us_status))
+                    s_state = "Ready to switch on";
+                else if (Servo.isSwitchedOn(us_status))
+                    s_state = "Switched on";
+                else if (Servo.isOperationEnabled(us_status))
+                    s_state = "Operation enabled";
+                else if (Servo.isFault(us_status))
+                    s_state = "Fault";
+                else
+                    s_state = "<unknown>";
 
+                FOutCW[0] = s_state;
+            }
 
+            // Control word value
 
-
-
-
-
-        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
         /// <summary>
-        /// Update the configuration setting string
+        /// FormAxisState Shown event handler. Updates actual state controls.
         /// </summary>
-        private string GetConfigString()
+        private void FormAxisState_Shown(object sender, EventArgs e)
         {
-            string s_conf;
-
-            servo.GetConfigString(out s_conf);
-            return s_conf; 
+            UpdateActualState();
         }
+
+        /// <summary>
+        /// cbxControlCmds SelectedIndexChanged event handler. Trys to set the state machine.
+        /// </summary>
+		private void cbxControlCmds_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (FInAxisState[0].Index >= 0)
+            {
+                Servo.TStateCmd cmd;
+                int rc;
+
+                cmd = ((ItemEntry)FInAxisState[0].Index).GetCmd();
+                if ((rc = servo.SetStateMachine(cmd, 500)) != 0)
+                    FOutErrorMessage[0] = "Axis state change failed";
+
+                UpdateActualState();
+            }
+
+		}*/
+
 	}
 }
+

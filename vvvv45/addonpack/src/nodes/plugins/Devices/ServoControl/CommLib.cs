@@ -32,29 +32,29 @@ namespace VVVV.Nodes
 
         // Flash function codes
         public const int nvmedia_servoeprom = 0x0100;   // Flash-ERPOM (all drive types)
-        public const int nvmedia_dteprom = 0x0200;   // I2C EEPROM (DriveTerminal, only MaxiDrive)
+        public const int nvmedia_dteprom    = 0x0200;   // I2C EEPROM (DriveTerminal, only MaxiDrive)
         public const int nvmedia_dtchipcard = 0x0300;   // I2C Chip card (DriveTerminal, only MaxiDrive)
 
-        public const int nvstore_save = 0x0001;   // save
-        public const int nvstore_load = 0x0002;   // load
-        public const int nvstore_validate = 0x0003;   // verify
+        public const int nvstore_save       = 0x0001;   // save
+        public const int nvstore_load       = 0x0002;   // load
+        public const int nvstore_validate   = 0x0003;   // verify
 
         // Interface types (Interfaces, CommGetInterfce())
-        public const int cif_Mask = 0x00ff;   // The mask bits for the interface type
-        public const int cif_Flags = 0xff00;   // The mask bits for additional interface flags
+        public const int cif_Mask           = 0x00ff;   // The mask bits for the interface type
+        public const int cif_Flags          = 0xff00;   // The mask bits for additional interface flags
         // Interfaces, die Konstanten entpsprechen den Konstanten im Gerätetypschlüssel 
-        public const int cif_Serial = 0;        // Serial, standard
-        public const int cif_Interbus = 1;        // Interbus (peripheral bus)
-        public const int cif_CANOpen = 2;        // CANOpen
-        public const int cif_InterbusLWL = 3;        // Interbus (LWL field bus)
-        public const int cif_Sercos = 4;        // Sercos (reserved, not avaiable)
-        public const int cif_Profibus = 5;        // Profibus DP, DPV1
+        public const int cif_Serial         = 0;        // Serial, standard
+        public const int cif_Interbus       = 1;        // Interbus (peripheral bus)
+        public const int cif_CANOpen        = 2;        // CANOpen
+        public const int cif_InterbusLWL    = 3;        // Interbus (LWL field bus)
+        public const int cif_Sercos         = 4;        // Sercos (reserved, not avaiable)
+        public const int cif_Profibus       = 5;        // Profibus DP, DPV1
         // Interfaces without a fielbus module
-        public const int cif_Demo = 254;      // Demo driver
-        public const int cif_Unknown = 255;      // Unknown Interface
+        public const int cif_Demo           = 254;      // Demo driver
+        public const int cif_Unknown        = 255;      // Unknown Interface
         // Additional flags
-        public const int cifflag_Tcp = 0x0100;   // Indirect over TCP server
-        public const int cifflag_Oktel = 0x0200;   // Indirect over Oktel server
+        public const int cifflag_Tcp        = 0x0100;   // Indirect over TCP server
+        public const int cifflag_Oktel      = 0x0200;   // Indirect over Oktel server
 
         // private members
         private IntPtr commHandle;  // Communication channel handle
@@ -103,7 +103,7 @@ namespace VVVV.Nodes
 
         [DllImport("CommSerial.dll", EntryPoint = "CommConnectH", CharSet = CharSet.Ansi)]
         private static extern int CommConnect(IntPtr h);
-
+        
         [DllImport("CommSerial.dll", EntryPoint = "CommDisconnectH", CharSet = CharSet.Ansi)]
         private static extern int CommDisconnect(IntPtr h);
 
@@ -161,7 +161,7 @@ namespace VVVV.Nodes
         {
             return CommConfig(commHandle, formOwner.Handle);
         }
-
+        
         /// <summary>
         /// Wrapper method for driver dll function CommLoadConfig
         /// </summary>
@@ -181,7 +181,7 @@ namespace VVVV.Nodes
         {
             return CommSaveConfig(commHandle, sRegistryPath);
         }
-
+        
         /// <summary>
         /// Wrapper method for driver dll function CommGetConfig
         /// </summary>
@@ -341,7 +341,7 @@ namespace VVVV.Nodes
             int rc;
 
             sVendor = sModel = sRevision = string.Empty;
-
+            
             rc = CommIdentify(commHandle, bIdent, 1);
             if (rc == 0)
             {
@@ -349,7 +349,7 @@ namespace VVVV.Nodes
                 for (i = 0; i < 16; i++)
                 {
                     if (bIdent[i] != 0)
-                        sVendor += (char)bIdent[i];
+                        sVendor += (char) bIdent[i];
                     else
                         break;
                 }
@@ -361,7 +361,7 @@ namespace VVVV.Nodes
                     else
                         break;
                 }
-
+                
                 for (i = 32; i < 48; i++)
                 {
                     if (bIdent[i] != 0)
@@ -539,7 +539,7 @@ namespace VVVV.Nodes
             int rc;
             byte[] bData;
             uint udata;
-
+            
             rc = ReadElement(Index, SubIndex, out bData, 4);
             if (rc == 0)
             {
@@ -552,7 +552,7 @@ namespace VVVV.Nodes
             {
                 udata = 0;
             }
-
+            
             data = unchecked((int)udata);
 
             return rc;
@@ -680,7 +680,7 @@ namespace VVVV.Nodes
         public int WriteI16(int Index, int SubIndex, short data)
         {
             byte[] bData = new byte[2];
-            ushort udata = unchecked((ushort)data);
+            ushort udata = unchecked((ushort) data);
 
             if (endianMode == bigEndian)
             {
@@ -708,19 +708,26 @@ namespace VVVV.Nodes
         /// <returns>0 if ok or driver dll error code</returns>
         public int WriteU16(int Index, int SubIndex, ushort data)
         {
-            byte[] bData = new byte[2];
-
-            if (endianMode == bigEndian)
-            {
-                bData[0] = (byte)(data >> 8);
-                bData[1] = (byte)data;
+//            byte[] bData = new byte[2];
+            byte[] bData = BitConverter.GetBytes(data);
+           try {
+	            if (endianMode == bigEndian)
+	            {
+//	                bData[0] = (byte)(data >> 8);
+//	                bData[1] = (byte)(data);
+	            	Array.Reverse(bData);
+//	                bData = BitConverter.GetBytes(((data>>8)&0xff)+((data << 8)&0xff00));
+	            }
+	            else
+	            {
+//	                bData[1] = (byte)(data >> 8);
+//	                bData[0] = (byte)data;
+	            }
             }
-            else
+            catch (Exception e)
             {
-                bData[1] = (byte)(data >> 8);
-                bData[0] = (byte)data;
+            	bData = BitConverter.GetBytes(data);
             }
-
             return WriteElement(Index, SubIndex, bData, 2);
         }
 
@@ -736,22 +743,24 @@ namespace VVVV.Nodes
         /// <returns>0 if ok or driver dll error code</returns>
         public int WriteI32(int Index, int SubIndex, int data)
         {
-            byte[] bData = new byte[4];
-            uint udata = unchecked((uint)data);
+//            byte[] bData = new byte[4];
+            byte[] bData = BitConverter.GetBytes(data);
+//            uint udata = unchecked((uint)data);
 
             if (endianMode == bigEndian)
             {
-                bData[0] = (byte)(udata >> 24);
-                bData[1] = (byte)(udata >> 16);
-                bData[2] = (byte)(udata >> 8);
-                bData[3] = (byte)udata;
+//                bData[0] = (byte)(udata >> 24);
+//                bData[1] = (byte)(udata >> 16);
+//                bData[2] = (byte)(udata >>  8);
+//                bData[3] = (byte)udata;
+Array.Reverse(bData);
             }
             else
             {
-                bData[3] = (byte)(udata >> 24);
-                bData[2] = (byte)(udata >> 16);
-                bData[1] = (byte)(udata >> 8);
-                bData[0] = (byte)udata;
+//                bData[3] = (byte)(udata >> 24);
+//                bData[2] = (byte)(udata >> 16);
+//                bData[1] = (byte)(udata >> 8);
+//                bData[0] = (byte)udata;
             }
 
             return WriteElement(Index, SubIndex, bData, 4);
