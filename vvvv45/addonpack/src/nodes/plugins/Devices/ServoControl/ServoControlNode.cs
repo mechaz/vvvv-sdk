@@ -24,12 +24,18 @@ namespace VVVV.Nodes
 		
         [Input("Update Status", IsBang=true)]
         IDiffSpread<bool> FInUpdateStatus;
+        
+        [Input("Update Axis Status", IsBang=true)]
+        IDiffSpread<bool> FInSendAxisState;
 
         [Input("Set COMPort")]
         IDiffSpread<bool> FInSetCOMPort;
 
-        [Input("Send Data", IsBang=true)]
+        [Input("Send Position", IsBang=true)]
         IDiffSpread<bool> FInSendData;
+        
+        [Input("Fault reset and go home", IsBang=true)]
+        IDiffSpread<bool> FInFaultReset;
         
         [Input("Axis State", EnumName = AXISSTATE_ENUM_NAME, Order = 2)]
         ISpread<EnumEntry> FInAxisState;
@@ -98,7 +104,7 @@ namespace VVVV.Nodes
 			};
 			EnumManager.UpdateEnum(AXISSTATE_ENUM_NAME,"", AxisStates);
         }
-		
+		private Servo.TStateCmd cmd;
 		//called when data for any output pin is requested
 		private string GetConfigString()
 	        {
@@ -107,6 +113,10 @@ namespace VVVV.Nodes
 	            servo.GetConfigString(out s_conf);
 	            return s_conf; 
 	        }
+		public Servo.TStateCmd GetCmd()
+            {
+                return cmd;
+            }
 		public void Evaluate(int SpreadMax)
 		{
             FOutConfig.SliceCount = FOutErrorInt.SliceCount = 1;
@@ -149,10 +159,12 @@ namespace VVVV.Nodes
             }
             FCOMConfigChanged = false;
             FOutIsConnected[0] = FConnected;
-            //read out position
+            
+            
             if (FConnected == true)
             {
 				int pos;
+           		ushort us_status, us_control;
 				if (servo.ReadPos(out pos) == 0)
 				{
 					FOutPosition[0] = pos;
@@ -166,17 +178,93 @@ namespace VVVV.Nodes
 						return;
 					}
 				}
+				if (FInFaultReset.IsChanged && FInFaultReset[0])
+	            {
+	        		FaultReset();
+	            }
 				/*if (servo.ReadControlWord(out us_control) == 0)
 	            {
 	                FOutCW[0] = string.Format("{0:x4}", us_control);
 	            }*/
-        
+				if (servo.ReadStatusWord(out us_status) == 0)
+	            {
+	                FOutSW[0] = string.Format("{0:x4}", us_status);
+	                string s_state;
+
+                 // Convert axis state to human readable string
+                if (Servo.isSwitchOnDisabled(us_status))
+                    s_state = "Switch on disabled";
+                else if (Servo.isRdyToSwitchOn(us_status))
+                    s_state = "Ready to switch on";
+                else if (Servo.isSwitchedOn(us_status))
+                    s_state = "Switched on";
+                else if (Servo.isOperationEnabled(us_status))
+                    s_state = "Operation enabled";
+                else if (Servo.isFault(us_status))
+                    s_state = "Fault";
+                else
+                    s_state = "<unknown>";
+                FOutCW[0] = s_state;
+                
+	            }
+				if (FInSendAxisState.IsChanged && FInSendAxisState[0] == true){
+					FOutErrorMessage[0] = "Trying axis state change";
+				
+			        if (FInAxisState[0].Index >= 0)
+			            {
+			                Servo.TStateCmd cmd;
+			                int rc;
+							int i = FInAxisState[0].Index;
+							cmd = Servo.TStateCmd.cmdResetFault;
+							switch (i)
+							{
+								case 0:
+									cmd = Servo.TStateCmd.cmdDisableVoltage;
+									break;
+								case 1:
+									cmd = Servo.TStateCmd.cmdQuickStop;
+									FOutErrorMessage[0] = "Sending RcmdQuickStop";
+									break;
+								case 2:
+									cmd = Servo.TStateCmd.cmdShutdown;
+									FOutErrorMessage[0] = "Sending cmdShutdown";
+									break;
+								case 3:
+									cmd = Servo.TStateCmd.cmdSwitchOn;
+									FOutErrorMessage[0] = "Sending cmdSwitchOn";
+									break;
+								case 4:
+									cmd = Servo.TStateCmd.cmdEnableOperation;
+									FOutErrorMessage[0] = "Sending cmdEnableOperation";
+									break;
+								case 5:
+									cmd = Servo.TStateCmd.cmdDisableOperation;
+									FOutErrorMessage[0] = "Sending cmdDisableOperation";
+									break;
+								case 6:
+									cmd = Servo.TStateCmd.cmdResetFault;
+									FOutErrorMessage[0] = "Sending Reset Fault";
+									break;
+								default:
+									FOutErrorMessage[0] = "Invalid Axis state specified";
+									break;
+																	
+							}
+							
+			                if ((rc = servo.SetStateMachine(cmd, 500)) != 0)
+			                {
+			                    FOutErrorMessage[0] = "Axis state change failed";
+			                }else{
+			                	//FOutErrorMessage[0] = "Axis state change succesfull";
+			                }
+			                //UpdateActualState();
+			        }
+				}
 				//FInAxisState[0].Index
             }
-           
-            // -----------------------------------------------------------------------
-            // -----------------------------------------------------------------------
-            if (FInSendData.IsChanged && FInSendData[0])
+		
+
+       	if (FInSendData.IsChanged && FInSendData[0])
             {
             	DoSetPos(FInSetPos[0],FInSetVel[0],FInSetAbsolute[0]);
             }
@@ -222,7 +310,17 @@ namespace VVVV.Nodes
             }
         }
 
-       
+        private void FaultReset()
+        {
+        	FOutErrorMessage[0] = "Resetting fault and going back to 0";
+        	servo.SetStateMachine(Servo.TStateCmd.cmdResetFault, 500);
+        	DoSetPos(0,2000,true);
+        	servo.SetStateMachine(Servo.TStateCmd.cmdEnableOperation, 500);
+        	
+        }
+        
+		
+
 
         /* private string sItem;
             private Servo.TStateCmd cmd;
