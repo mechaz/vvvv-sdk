@@ -29,10 +29,17 @@
     <Reference Include="VVVV.Utils3rdParty">
       <HintPath>..\..\..\..\..\..\lib\core\VVVV.Utils3rdParty.dll</HintPath>
     </Reference>
+    <Reference Include="xiApi.NET">
+      <HintPath>dependencies\xiApi.NET.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ximeaCAM.cs" />
+    <Compile Include="ximeaSettings.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="dependencies\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
 </Project>
