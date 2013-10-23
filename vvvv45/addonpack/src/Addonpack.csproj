@@ -285,6 +285,10 @@
       <Project>{B292B21F-B781-4C3D-B25B-36C2A60B678E}</Project>
       <Name>WiiMotePlugin</Name>
     </ProjectReference>
+    <ProjectReference Include="nodes\plugins\Devices\ximea Cam\ximeaCAM.csproj">
+      <Project>{8B0C53E6-88B9-47EC-9687-D4CAB65560A5}</Project>
+      <Name>ximeaCAM</Name>
+    </ProjectReference>
     <ProjectReference Include="nodes\plugins\File\Attributes\AttributesFile.csproj">
       <Project>{1A2E3C6E-21BE-466C-944F-2E5838B396AB}</Project>
       <Name>AttributesFile</Name>
