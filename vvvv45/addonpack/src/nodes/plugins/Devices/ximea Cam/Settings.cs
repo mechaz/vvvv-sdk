@@ -348,8 +348,6 @@ namespace VVVV.Nodes
         
         private float AGMaxLimit; // Get, Set
         
-        private float AGMaxLimit; // Get, Set
-        
         private int AEAGLevel; // Get, Set / default 400
         
         private int BPC; // Get, Set / default 0 (disabled)

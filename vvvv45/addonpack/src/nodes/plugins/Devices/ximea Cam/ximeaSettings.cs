@@ -80,7 +80,7 @@ namespace VVVV.Nodes
         private float FExposurePriority; // 0,5 - exposure 50%, gain 50% / default 0.8
         private int FAEMaxLimit; // Get, Set default 1000000 ls
         private float FAGMaxLimit; // Get, Set
-        private float FAGMaxLimit; // Get, Set
+        
         private int FAEAGLevel; // Get, Set / default 400
         private int FBPC; // Get, Set / default 0 (disabled)
         private int FIsCooled; // Get / returns 1 if supported
@@ -91,7 +91,6 @@ namespace VVVV.Nodes
         private int FHDR; // Get, Set default 0 (disabled) alpha dev state
         private string FAPIVersion; // Get
         private string FDriverVersion; // Get
-        private int FAvailableBandwidth; // Get
 
         [Output("Device Name")]
         ISpread<string> FOutDeviceName;
@@ -145,9 +144,6 @@ namespace VVVV.Nodes
         ISpread<string> FOutUImageDataFormat;
 
         [Output("Image Is Color")]
-        ISpread<bool> FOutIsImageColor;
-
-        [Output("Sensor")]
         ISpread<bool> FOutIsImageColor;
 
         [Output("SensorData BitDepth")]

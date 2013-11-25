@@ -74,9 +74,17 @@ namespace VVVV.Nodes
         {
             try
             {
-                // Initialize first camera
-                myCam.OpenDevice(0);
 
+                myCam = new xiCam();
+                int z = -1;
+                myCam.GetNumberDevices(out z);
+
+                string s = "0";
+                
+                // Initialize first camera
+                myCam.OpenDevice(xiCam.OpenDevBy.SerialNumber, "41392059");
+                
+                /*
                 // set device exposure
                 myCam.SetParam(PRM.EXPOSURE, exposure);
                 myCam.SetParam(PRM.HEIGHT, 1080);
@@ -88,12 +96,14 @@ namespace VVVV.Nodes
                 myCam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.MONO8);
 
                 FLogger.Log(LogType.Debug, "Parameters set ..");
+                 * */
             }
 
             catch (System.ApplicationException appExc)
             {
                 // Show handled error
                 FLogger.Log(LogType.Debug, "Error setting params ..");
+                FLogger.Log(LogType.Debug, appExc.Message);
                 myCam.CloseDevice();
             }
 
