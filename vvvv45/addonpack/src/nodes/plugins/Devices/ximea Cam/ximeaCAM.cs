@@ -2,10 +2,7 @@
 using System;
 using System.Drawing;
 using System.ComponentModel.Composition;
-using System.Runtime.InteropServices;
 
-// using SlimDX;
-// using SlimDX.Direct3D9;
 using VVVV.PluginInterfaces.V1;
 using VVVV.PluginInterfaces.V2;
 using VVVV.PluginInterfaces.V2.EX9;
@@ -14,19 +11,18 @@ using VVVV.Utils.VMath;
 using VVVV.Utils.SlimDX;
 using SlimDX.Direct3D9;
 using xiApi.NET;
-
 using VVVV.Core.Logging;
-#endregion usings
-
-
 using VertexType = VVVV.Utils.SlimDX.TexturedVertex;
+
+#endregion usings
 
 
 namespace VVVV.Nodes
 {
 	#region PluginInfo
-	[PluginInfo(Name = "ximeaCAM", Category = "Devices", Version = "1.0", Help = "Control settings of a ximea usb 3.0 camera", Tags = "")]
+	[PluginInfo(Name = "XIMEA Camera", Category = "Devices", Version = "1.0", Help = "XIMEA camera", Tags = "")]
 	#endregion PluginInfo
+
     public class ximeaCAM : IPluginEvaluate, IPartImportsSatisfiedNotification
 	{
         //little helper class used to store information for each
@@ -40,108 +36,20 @@ namespace VVVV.Nodes
         }
 
 		#region fields & pins
-		
-        [Input("Set Params", IsSingle=true, IsBang=true, DefaultBoolean=false)]
-        IDiffSpread<bool> FInSetParams;
 
-        [Input("Read Settings", IsSingle = true, IsBang = true, DefaultBoolean = false)]
-        IDiffSpread<bool> FInReadSettings;
+        private XimeaSettings xs = new XimeaSettings();
 
         [Input("Cam Serial", IsSingle = true)]
         IDiffSpread<string> FInCamSerial;
 
-        [Input("Framerate", IsSingle = true)]
-        IDiffSpread<float> FInFrameRate;
+        [Input("Set Params", IsSingle=true, IsBang=true, DefaultBoolean=false)]
+        IDiffSpread<bool> FInSetParams;
 
-        [Input("Width", IsSingle = true)]
-        IDiffSpread<int> FInWidth;
+        [Input("Settings")]
+        IDiffSpread<XimeaSettings> FInSettings;
 
-        [Input("Height", IsSingle = true)]
-        IDiffSpread<int> FInHeight;
-
-        [Input("Offset X", IsSingle = true)]
-        IDiffSpread<int> FInOffsetX;
-
-        [Input("Offset Y", IsSingle = true)]
-        IDiffSpread<int> FInOffsetY;
-
-        [Input("Exposure", IsSingle = true)]
-        IDiffSpread<int> FInExposure;
-
-        [Input("Gain", IsSingle = true)]
-        IDiffSpread<float> FInGain;
-
-        [Input("DS Mode", IsSingle = true)]
-        IDiffSpread<float> FInDS;
-
-        [Input("Enable Image Processing", IsSingle = true, IsToggle=true)]
+        [Input("Enable Image Processing", IsSingle = true, IsToggle = true)]
         IDiffSpread<bool> FInEnableProcessImage;
-
-        [Input("Binning / Skipping", IsSingle = true)]
-        IDiffSpread<bool> FInBinningSkipping;
-
-        [Input("Limit Bandwidth", IsSingle = true)]
-        IDiffSpread<int> FInLimitBandwidth;
-
-
-
-
-        [Output("DS Min")]
-        ISpread<float> FOutDSMin;
-
-        [Output("DS Max")]
-        ISpread<float> FOutDSMax;
-
-        [Output("DS Mode")]
-        ISpread<float> FOutDSMode;
-    
-        [Output("Width Min")]
-        ISpread<float> FOutWidthMin;
-
-        [Output("Width Max")]
-        ISpread<float> FOutWidthMax;
-
-        [Output("Width")]
-        ISpread<float> FOutWidth;
-
-        [Output("Height Min")]
-        ISpread<float> FOutHeightMin;
-
-        [Output("Height Max")]
-        ISpread<float> FOutHeightMax;
-
-        [Output("Height")]
-        ISpread<float> FOutHeight;
-
-        [Output("FPS Min")]
-        ISpread<float> FOutFPSMin;
-
-        [Output("FPS Max")]
-        ISpread<float> FOutFPSMax;
-
-        [Output("FPS")]
-        ISpread<float> FOutFPS;
-
-        [Output("Buff Policy")]
-        ISpread<string> FOutBufferPolicy;
-
-        [Output("Downsampling Type")]
-        ISpread<string> FOutDSType;
-
-        [Output("Gain")]
-        ISpread<float> FOutGain;
-
-        [Output("Exposure")]
-        ISpread<float> FOutExposure;
-
-        [Output("Limit Bandwidth")]
-        ISpread<int> FOutLimitBandwidth;
-
-        [Output("Limit Bandwidth Min")]
-        ISpread<int> FOutLimitBandwidthMin;
-
-        [Output("Limit Bandwidth Max")]
-        ISpread<int> FOutLimitBandwidthMax;
 
         [Output("Camera Found (Serial Valid)")]
         ISpread<bool> FOutCamFoundSerialValid;
@@ -149,9 +57,14 @@ namespace VVVV.Nodes
         [Output("Texture Out")]
         public ISpread<TextureResource<Info>> FTextureOut;
 
+        
+        [Output("xiCam")]
+        public ISpread<xiCam> FOutXiCam;
 
+        [Output("On Settings Change")]
+        ISpread<bool> FOutSettingsChanged;
 
-        private xiCam myCam = new xiCam();
+        private xiCam cam = new xiCam();
         private bool FParamsChanged = false;
         
         private string FCamSerial = null;
@@ -162,12 +75,14 @@ namespace VVVV.Nodes
         private int FCurrentWidth;
         private int FCurrentHeight;
 
-
 		[Import()]
 		ILogger FLogger;
 
-		#endregion fields & pins
+        [Import]
+        IHDEHost FHost;
 
+
+		#endregion fields & pins
 
         public void OnImportsSatisfied()
         {
@@ -177,31 +92,38 @@ namespace VVVV.Nodes
         }
 
 		//called when data for any output pin is requested
-		public void Evaluate(int SpreadMax)
+		public void Evaluate(int spreadMax)
 		{
+            FOutSettingsChanged[0] = false;
             if (FInCamSerial.IsChanged || FCamSerial == null)
             {
                 try
                 {
                     if (FCamRunning)
                     {
-                        myCam.StopAcquisition();
-                        myCam.CloseDevice();
+                        cam.StopAcquisition();
+                        cam.CloseDevice();
                         FCamRunning = false;
                     }
                     FCamSerial = FInCamSerial[0];
-                    myCam.OpenDevice(xiCam.OpenDevBy.SerialNumber, FCamSerial);
-                    myCam.StartAcquisition();
+                    cam.OpenDevice(xiCam.OpenDevBy.SerialNumber, FCamSerial);
+                    cam.StartAcquisition();
+                    // set deafult settings:
+                    SetParams(cam, FCamSerial, xs);
+
                     FCamSerialValid = true;
                     FCamRunning = true;
-                    myCam.GetParam(PRM.WIDTH, out FCurrentWidth);
-                    myCam.GetParam(PRM.HEIGHT, out FCurrentHeight);
+                    FOutXiCam[0] = cam;
+                    cam.GetParam(PRM.WIDTH, out FCurrentWidth);
+                    cam.GetParam(PRM.HEIGHT, out FCurrentHeight);
                 }
                 catch (Exception e)
                 {
+                    FCamSerial = "";
                     FCamSerialValid = false;
                     FCamRunning = false;
-                    FLogger.Log(LogType.Debug, "Cam Init Failed: " + e.Message);
+                    FOutXiCam[0] = null;
+                    FLogger.Log(LogType.Debug, "cam init failed (for sn " + FInCamSerial[0] + "): " + e.Message);
                 }
             }
             if (FInEnableProcessImage.IsChanged)
@@ -218,33 +140,31 @@ namespace VVVV.Nodes
                 {
                     FDoImageProcessing = FInEnableProcessImage[0];
                 }
-                if (FInReadSettings.IsChanged && FInReadSettings[0])
-                {
-                    ReadSettings();
-                }
                 if (FInSetParams.IsChanged && FInSetParams[0])
                 {
-                    SetParams();
-                    myCam.GetParam(PRM.WIDTH, out FCurrentWidth);
-                    myCam.GetParam(PRM.HEIGHT, out FCurrentHeight);
+                    SetParams(cam, FCamSerial, FInSettings[0]);
+                    cam.GetParam(PRM.WIDTH, out FCurrentWidth);
+                    cam.GetParam(PRM.HEIGHT, out FCurrentHeight);
+                    FOutXiCam[0] = cam;
                 }
-                if (FInExposure.IsChanged || FInGain.IsChanged || FInHeight.IsChanged || FInWidth.IsChanged || FInOffsetX.IsChanged || FInOffsetY.IsChanged || FInDS.IsChanged || FInFrameRate.IsChanged || FInBinningSkipping.IsChanged || FInLimitBandwidth.IsChanged)
+                if (FInSettings.IsChanged && FInSettings != null)
                 {
                     FParamsChanged = true;
                 }
                 if (FParamsChanged)
                 {
-                    SetParams();
-                    myCam.GetParam(PRM.WIDTH, out FCurrentWidth);
-                    myCam.GetParam(PRM.HEIGHT, out FCurrentHeight);
+                    SetParams(cam, FCamSerial, FInSettings[0]);
+                    cam.GetParam(PRM.WIDTH, out FCurrentWidth);
+                    cam.GetParam(PRM.HEIGHT, out FCurrentHeight);
                     FParamsChanged = false;
-                    ReadSettings();
+                    FOutXiCam[0] = cam;
+                    FOutSettingsChanged[0] = true;
                 }
                 if (FDoImageProcessing)
                 {
-                    FTextureOut.ResizeAndDispose(SpreadMax, CreateTextureResource);
+                    FTextureOut.ResizeAndDispose(spreadMax, CreateTextureResource);
 
-                    for (int i = 0; i < SpreadMax; i++)
+                    for (int i = 0; i < spreadMax; i++)
                     {
                         var textureResource = FTextureOut[i];
                         var info = textureResource.Metadata;
@@ -287,7 +207,7 @@ namespace VVVV.Nodes
             int timeout = 1000;
             try
             {
-                myCam.GetImage(out Bitmap, timeout);
+                cam.GetImage(out Bitmap, timeout);
             }
             catch (Exception e) 
             {
@@ -297,117 +217,27 @@ namespace VVVV.Nodes
         }
 
 
-        private void SetParams()
+        private void SetParams(xiCam theCam, string serial, XimeaSettings xis)
         {
             try
             {
-                // myCam.OpenDevice(xiCam.OpenDevBy.SerialNumber, FCamSerial);
-                // FIsOpened = true;
-                myCam.SetParam(PRM.DOWNSAMPLING, FInDS[0]);
-                myCam.SetParam(PRM.IMAGE_DATA_FORMAT, IMG_FORMAT.RGB32);
-                myCam.SetParam(PRM.WIDTH, FInWidth[0]);
-                myCam.SetParam(PRM.HEIGHT, FInHeight[0]);
-                myCam.SetParam(PRM.OFFSET_X, FInOffsetX[0]);
-                myCam.SetParam(PRM.OFFSET_Y, FInOffsetY[0]);
-                myCam.SetParam(PRM.EXPOSURE, FInExposure[0]);
-                myCam.SetParam(PRM.GAIN, FInGain[0]);
-                myCam.SetParam(PRM.FRAMERATE, FInFrameRate[0]);
-
-
-                int bs = 0;
-                if (FInBinningSkipping[0])
-                    bs = 1;
-                myCam.SetParam(PRM.DOWNSAMPLING_TYPE, bs);
-                myCam.SetParam(PRM.LIMIT_BANDWIDTH, FInLimitBandwidth[0]);
-
-                FLogger.Log(LogType.Debug, "Parameters set ..");
+                cam.SetParam(PRM.DOWNSAMPLING, xis.DownsamplingMode);
+                cam.SetParam(PRM.IMAGE_DATA_FORMAT, xis.ImageDataFormat);
+                cam.SetParam(PRM.WIDTH, xis.Width);
+                cam.SetParam(PRM.HEIGHT, xis.Height);
+                cam.SetParam(PRM.OFFSET_X, xis.Offset_X);
+                cam.SetParam(PRM.OFFSET_Y, xis.Offset_Y);
+                cam.SetParam(PRM.EXPOSURE, xis.Exposure);
+                cam.SetParam(PRM.GAIN, xis.Gain);
+                cam.SetParam(PRM.FRAMERATE, xis.Framerate);
+                cam.SetParam(PRM.DOWNSAMPLING_TYPE, xis.DownsamplingType);
+                cam.SetParam(PRM.LIMIT_BANDWIDTH, xis.LimitBandwidth);
+                FLogger.Log(LogType.Debug, "Cam " + serial + ": parameters set successfully");
             }
             catch (Exception e)
             {
-                FLogger.Log(LogType.Debug, "Error setting cam properties: " + e.Message);
-            }
-            finally
-            {
-
+                FLogger.Log(LogType.Debug, "Cam " + serial + ": error setting device properties: " + e.Message);
             }
         }
-
-        private void ReadSettings()
-        {
-            try
-            {
-                float dsMin;
-                float dsMax;
-                float ds;
-                float widthMin;
-                float heightMin;
-                float widthMax;
-                float heightMax;
-                int offsetX;
-                int offsetY;
-                float width;
-                float height;
-                float fps;
-                float fpsMin;
-                float fpsMax;
-                string dsType;
-                float gain;
-                float exposure;
-                int buffersQueueSize;
-                int limitBandwidth;
-                int limitBandwidthMin;
-                int limitBandwidthMax;
-                myCam.GetParam(PRM.DOWNSAMPLING_MIN, out dsMin);
-                myCam.GetParam(PRM.DOWNSAMPLING_MAX, out dsMax);
-                myCam.GetParam(PRM.DOWNSAMPLING, out ds);
-                myCam.GetParam(PRM.WIDTH_MIN, out widthMin);
-                myCam.GetParam(PRM.WIDTH_MAX, out widthMax);
-                myCam.GetParam(PRM.HEIGHT_MIN, out heightMin);
-                myCam.GetParam(PRM.HEIGHT_MAX, out heightMax);
-                myCam.GetParam(PRM.WIDTH, out width);
-                myCam.GetParam(PRM.HEIGHT, out height);
-                myCam.GetParam(PRM.OFFSET_X, out offsetX);
-                myCam.GetParam(PRM.OFFSET_Y, out offsetY);
-                myCam.GetParam(PRM.FRAMERATE, out fps);
-                myCam.GetParam(PRM.FRAMERATE_MIN, out fpsMin);
-                myCam.GetParam(PRM.FRAMERATE_MAX, out fpsMax);
-                dsType = myCam.GetParamString(PRM.DOWNSAMPLING_TYPE);
-                myCam.GetParam(PRM.GAIN, out gain);
-                myCam.GetParam(PRM.EXPOSURE, out exposure);
-                myCam.GetParam(PRM.BUFFERS_QUEUE_SIZE, out buffersQueueSize);
-                myCam.GetParam(PRM.LIMIT_BANDWIDTH, out limitBandwidth);
-                myCam.GetParam(PRM.LIMIT_BANDWIDTH_MIN, out limitBandwidthMin);
-                myCam.GetParam(PRM.LIMIT_BANDWIDTH_MAX, out limitBandwidthMax);
-
-
-                FOutDSMin[0] = dsMin;
-                FOutDSMax[0] = dsMax;
-                FOutWidth[0] = width;
-                FOutHeight[0] = height;
-                FOutWidthMin[0] = widthMin;
-                FOutWidthMax[0] = widthMax;
-                FOutHeightMin[0] = heightMin;
-                FOutHeightMax[0] = heightMax;
-                FOutFPS[0] = fps;
-                FOutFPSMin[0] = fpsMin;
-                FOutFPSMax[0] = fpsMax;
-                FOutDSMode[0] = ds;
-                FOutDSType[0] = dsType;
-                FOutGain[0] = gain;
-                FOutExposure[0] = exposure;
-                FOutLimitBandwidth[0] = limitBandwidth;
-                FOutLimitBandwidthMin[0] = limitBandwidthMin;
-                FOutLimitBandwidthMax[0] = limitBandwidthMax;
-            }
-            catch (Exception e) 
-            {
-                FLogger.Log(LogType.Debug, "Error reading cam properties: " + e.Message);
-            }
-            
-        }
-
-
-
-
 	}
 }

@@ -25,6 +25,9 @@
     <Reference Include="VVVV.Core">
       <HintPath>..\..\..\..\..\..\lib\core\VVVV.Core.dll</HintPath>
     </Reference>
+    <Reference Include="VVVV.Hosting">
+      <HintPath>..\..\..\..\..\..\src\core\Hosting\obj\x86\Debug\VVVV.Hosting.dll</HintPath>
+    </Reference>
     <Reference Include="VVVV.PluginInterfaces">
       <HintPath>..\..\..\..\..\..\lib\core\VVVV.PluginInterfaces.dll</HintPath>
     </Reference>
@@ -43,7 +46,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ximeaCAM.cs" />
-    <Compile Include="ximeaSettings.cs" />
+    <Compile Include="ximeaSettingsReader.cs" />
+    <Compile Include="ximeaSettingsWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="dependencies\" />

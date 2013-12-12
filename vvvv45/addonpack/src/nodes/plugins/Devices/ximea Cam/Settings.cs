@@ -5,7 +5,7 @@ using System.Text;
 
 namespace VVVV.Nodes
 {
-    class Settings
+    public class XimeaSettings
     {
         private string deviceName; // Get
         public string DeviceName
@@ -83,11 +83,11 @@ namespace VVVV.Nodes
             get { return gainMAX; }
         }
 
-        private int downsampling; // Get, Set
-        public int Downsampling
+        private int downsamplingMode; // Get, Set
+        public int DownsamplingMode
         {
-            get { return downsampling; }
-            set { downsampling = value; }
+            get { return downsamplingMode; }
+            set { downsamplingMode = value; }
         }
 
         private int downsamplingMIN; // Get
@@ -143,10 +143,11 @@ namespace VVVV.Nodes
             get { return colorFilterArray; }
         }
 
-        private float framerate; // Get
+        private float framerate; // Get, Set
         public float Framerate
         {
             get { return framerate; }
+            set { framerate = value; }
         }
 
         private float framerateMIN; // Get
@@ -366,5 +367,20 @@ namespace VVVV.Nodes
         private int AvailableBandwidth; // Get
 
         private float bufferPolicy; // Get(float), Set(int)
+
+        public XimeaSettings()
+        {
+            this.width = 640;
+            this.height = 480;
+            this.offset_X = 4;
+            this.offset_Y = 4;
+            this.framerate = 30;
+            this.exposure = 30000;
+            this.gain = 5;
+            this.downsamplingMode = 4;
+            this.downsamplingType = 1;
+            this.limitBandwidth = 320;
+            this.imageDataFormat = 3;
+        }
     }
 }
