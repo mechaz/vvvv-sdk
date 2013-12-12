@@ -149,6 +149,9 @@ namespace VVVV.Nodes
             FParameterNamesSingleList.Add("device name");
             FParameterNamesSingleList.Add("device type");
             FParameterNamesSingleList.Add("device serial");
+            FParameterNamesSingleList.Add("api version");
+            FParameterNamesSingleList.Add("driver version");
+
             FParameterNamesSingleList.Add("image data format");
             FParameterNamesSingleList.Add("downsampling type");
             FParameterNamesSingleList.Add("sensordata bitdepth");
@@ -404,6 +407,16 @@ namespace VVVV.Nodes
             string devSN;
             cam.GetParam(PRM.DEVICE_SN, out devSN);
             FParameterValuesSingleList.Add(devSN);
+
+            // api version
+            string apiV;
+            cam.GetParam(PRM.API_VERSION, out apiV);
+            FParameterValuesSingleList.Add(apiV);
+
+            // driver version
+            string driverV;
+            cam.GetParam(PRM.DRV_VERSION, out driverV);
+            FParameterValuesSingleList.Add(driverV);
 
             //FOutUImageDataFormat
             int imgFormat;
